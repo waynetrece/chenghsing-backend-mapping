@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>承興 vs iEvents 架構對照</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --brand: #1a2d5c;
+    --bg: #ffffff;
+    --bg-soft: #f7f8fa;
+    --text-1: #1a2d5c;
+    --text-2: #4a5568;
+    --text-3: #718096;
+    --text-4: #a0aec0;
+    --border: #e2e8f0;
+    --border-soft: #edf0f4;
+
+    /* status colors */
+    --st-ok: #10b981;          /* 可用 綠 */
+    --st-ok-soft: #d1fae5;
+    --st-partial: #f59e0b;     /* 部分 黃 */
+    --st-partial-soft: #fef3c7;
+    --st-new: #ef4444;         /* 需新做 紅 */
+    --st-new-soft: #fee2e2;
+    --st-hide: #6b7280;        /* 隱藏 灰 */
+    --st-hide-soft: #f3f4f6;
+  }
+  body {
+    background: var(--bg);
+    color: var(--text-1);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", "PingFang TC", sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    padding: 18px 40px;
+    display: flex; align-items: center; justify-content: space-between;
+    box-shadow: 0 1px 4px rgba(26,45,92,0.04);
+  }
+  .header-left { display: flex; align-items: center; gap: 16px; }
+  .header-logo {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: var(--brand); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px;
+  }
+  .header h1 { font-size: 18px; color: var(--text-1); font-weight: 700; }
+  .header h1 .sub { font-size: 12px; color: var(--text-3); font-weight: 400; margin-left: 10px; }
+
+  .summary-bar {
+    background: var(--bg-soft);
+    border-bottom: 1px solid var(--border-soft);
+    padding: 18px 40px;
+  }
+  .stats { display: flex; gap: 28px; flex-wrap: wrap; align-items: center; }
+  .stat { display: flex; align-items: baseline; gap: 6px; }
+  .stat-num { font-size: 20px; font-weight: 700; }
+  .stat-label { font-size: 12px; color: var(--text-3); }
+  .stat-num.ok { color: var(--st-ok); }
+  .stat-num.partial { color: var(--st-partial); }
+  .stat-num.new { color: var(--st-new); }
+  .stat-num.hide { color: var(--st-hide); }
+
+  .filter-bar {
+    padding: 14px 40px;
+    display: flex; gap: 8px; flex-wrap: wrap;
+    border-bottom: 1px solid var(--border-soft);
+    background: #fff;
+    position: sticky; top: 66px; z-index: 90;
+  }
+  .filter-btn {
+    padding: 7px 16px;
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-2);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .filter-btn:hover { border-color: var(--brand); color: var(--brand); }
+  .filter-btn.active { background: var(--brand); color: #fff; border-color: var(--brand); }
+  .filter-btn .count {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 1px 7px;
+    background: rgba(255,255,255,0.25);
+    border-radius: 10px;
+    font-size: 11px;
+  }
+  .filter-btn:not(.active) .count {
+    background: var(--bg-soft);
+    color: var(--text-3);
+  }
+
+  .canvas { max-width: 1400px; margin: 0 auto; padding: 32px 40px 80px; }
+
+  .section {
+    margin-bottom: 36px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .section-head {
+    padding: 16px 24px;
+    background: var(--bg-soft);
+    border-bottom: 1px solid var(--border-soft);
+    display: flex; align-items: center; gap: 14px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .section-head:hover { background: #edf0f4; }
+  .section-index {
+    width: 30px; height: 30px;
+    border-radius: 6px;
+    background: var(--brand); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 13px;
+    flex-shrink: 0;
+  }
+  .section-title { font-size: 16px; font-weight: 700; color: var(--text-1); }
+  .section-price {
+    margin-left: auto;
+    font-size: 13px; color: var(--text-2);
+    background: #fff;
+    padding: 3px 10px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    font-weight: 600;
+  }
+  .section-toggle {
+    color: var(--text-3);
+    font-size: 14px;
+    transition: transform 0.2s;
+  }
+  .section.collapsed .section-toggle { transform: rotate(-90deg); }
+  .section.collapsed .section-body { display: none; }
+
+  .section-body { padding: 20px 24px; }
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 14px;
+  }
+
+  .card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex; flex-direction: column;
+    gap: 10px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .card:hover {
+    border-color: var(--brand);
+    box-shadow: 0 4px 14px rgba(26,45,92,0.06);
+  }
+  .card-head {
+    display: flex; align-items: flex-start; gap: 10px;
+    justify-content: space-between;
+  }
+  .card-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-1);
+    line-height: 1.4;
+  }
+  .card-name .sub {
+    display: block;
+    font-size: 11px;
+    color: var(--text-3);
+    font-weight: 400;
+    margin-top: 2px;
+  }
+  .status-tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .status-tag::before {
+    content: '';
+    width: 6px; height: 6px; border-radius: 50%;
+    display: inline-block;
+  }
+  .status-tag.ok { background: var(--st-ok-soft); color: #065f46; }
+  .status-tag.ok::before { background: var(--st-ok); }
+  .status-tag.partial { background: var(--st-partial-soft); color: #92400e; }
+  .status-tag.partial::before { background: var(--st-partial); }
+  .status-tag.new { background: var(--st-new-soft); color: #991b1b; }
+  .status-tag.new::before { background: var(--st-new); }
+  .status-tag.hide { background: var(--st-hide-soft); color: #374151; }
+  .status-tag.hide::before { background: var(--st-hide); }
+
+  .card-ievents {
+    font-size: 12px;
+    color: var(--text-2);
+    background: var(--bg-soft);
+    padding: 8px 10px;
+    border-radius: 6px;
+    border-left: 3px solid var(--border);
+  }
+  .card-ievents .label {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-3);
+    letter-spacing: 0.5px;
+    margin-right: 6px;
+  }
+  .card-ievents a { color: var(--brand); text-decoration: none; word-break: break-all; }
+  .card-ievents a:hover { text-decoration: underline; }
+  .card-ievents.empty { color: var(--text-4); font-style: italic; }
+
+  .card-note {
+    font-size: 12px;
+    color: var(--text-2);
+    background: #fff7ed;
+    padding: 8px 10px;
+    border-radius: 6px;
+    border-left: 3px solid #fb923c;
+    line-height: 1.5;
+  }
+  .card-note .label {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    color: #9a3412;
+    letter-spacing: 0.5px;
+    margin-right: 6px;
+  }
+  .card-note.plain {
+    background: var(--bg-soft);
+    border-left-color: var(--border);
+  }
+  .card-note.plain .label { color: var(--text-3); }
+
+  .card.hidden { display: none; }
+
+  .footer {
+    max-width: 1400px; margin: 0 auto;
+    padding: 24px 40px 40px;
+    font-size: 12px; color: var(--text-4); text-align: center;
+    border-top: 1px solid var(--border-soft);
+  }
+  .footer a { color: var(--text-3); }
+
+  @media (max-width: 768px) {
+    .header, .summary-bar, .filter-bar, .canvas, .footer {
+      padding-left: 20px; padding-right: 20px;
+    }
+    .cards { grid-template-columns: 1fr; }
+    .filter-bar { top: 66px; }
+    .stats { gap: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="header-logo">承興</div>
+    <h1>承興 vs iEvents 架構對照<span class="sub">Backend Scope Analysis · 2026/02/23 報價單為準</span></h1>
+  </div>
+</div>
+
+<div class="summary-bar">
+  <div class="stats">
+    <div class="stat"><span class="stat-num" id="stat-total">0</span><span class="stat-label">總功能項</span></div>
+    <div class="stat"><span class="stat-num ok" id="stat-ok">0</span><span class="stat-label">可用</span></div>
+    <div class="stat"><span class="stat-num partial" id="stat-partial">0</span><span class="stat-label">部分可用</span></div>
+    <div class="stat"><span class="stat-num new" id="stat-new">0</span><span class="stat-label">需新做</span></div>
+    <div class="stat"><span class="stat-num hide" id="stat-hide">0</span><span class="stat-label">隱藏</span></div>
+    <div class="stat" style="margin-left:auto"><span class="stat-label">報價總額：</span><span class="stat-num" style="font-size:16px">$359,999.85 含稅</span></div>
+  </div>
+</div>
+
+<div class="filter-bar">
+  <button class="filter-btn active" data-filter="all">全部 <span class="count" id="count-all">0</span></button>
+  <button class="filter-btn" data-filter="ok">可用 <span class="count" id="count-ok">0</span></button>
+  <button class="filter-btn" data-filter="partial">部分可用 <span class="count" id="count-partial">0</span></button>
+  <button class="filter-btn" data-filter="new">需新做 <span class="count" id="count-new">0</span></button>
+  <button class="filter-btn" data-filter="hide">隱藏 <span class="count" id="count-hide">0</span></button>
+</div>
+
+<div class="canvas" id="canvas"></div>
+
+<div class="footer">
+  <p>承興 vs iEvents 架構對照 · 依 2026-02-23 報價單（$359,999.85 含稅）整理</p>
+  <p>綠＝iEvents 有切版可直接用 · 黃＝有切版但需程式補細節 · 紅＝iEvents 無需新做 · 灰＝iEvents 有但承興不需要建議隱藏</p>
+</div>
+
+<script>
+// =====================================================
+// 資料定義：每個報價單項目 → 子功能 → iEvents 對應 + 備註
+// =====================================================
+const sections = [
+  {
+    title: "1. 後台首頁儀表板",
+    price: "$15,000",
+    items: [
+      {
+        name: "統計卡片",
+        sub: "本週新增：活動 / 會員 / 報名 / 訂單",
+        status: "partial",
+        ievents: "/html/index.php + /html/event.php",
+        note: "iEvents 首頁有系統公告區塊，統計卡片需程式補 4 類數字統計元件"
+      },
+      {
+        name: "最新活動列表",
+        sub: "近期活動 + 快速進入編輯",
+        status: "ok",
+        ievents: "/html/event.php",
+        note: "iEvents 活動首頁有列表，直接對應"
+      },
+      {
+        name: "活動月曆",
+        sub: "月曆視圖顯示各日期活動",
+        status: "new",
+        ievents: null,
+        note: "iEvents 無月曆元件，程式全新做（可用 FullCalendar 等套件）"
+      },
+      {
+        name: "新會員列表",
+        sub: "近期註冊會員 + 快速進入詳情",
+        status: "new",
+        ievents: null,
+        note: "iEvents 無會員列表模組，程式新做"
+      }
+    ]
+  },
+  {
+    title: "2. 活動系統管理",
+    price: "$30,000",
+    items: [
+      {
+        name: "活動新增 / 編輯 / 刪除",
+        status: "ok",
+        ievents: "/html/eventSetting.php",
+        note: "iEvents 活動設定完整對應，程式依介面套用即可"
+      },
+      {
+        name: "活動基本資訊",
+        sub: "名稱、日期、地點、圖片、報名須知",
+        status: "ok",
+        ievents: "/html/eventSetting.php",
+        note: "欄位對應完整"
+      },
+      {
+        name: "報名時間 / 人數限額",
+        status: "ok",
+        ievents: "/html/eventSetting.php",
+        note: "iEvents 有對應欄位"
+      },
+      {
+        name: "活動狀態",
+        sub: "草稿 / 上架 / 下架",
+        status: "partial",
+        ievents: "/html/eventSetting.php",
+        note: "[Q1] iEvents 只有「啟用 / 停用」開關，承興要 3 種狀態（草稿 / 上架 / 下架）。問題較小，程式新增一個狀態欄位即可"
+      },
+      {
+        name: "活動複製",
+        sub: "複製既有活動快速建立",
+        status: "new",
+        ievents: null,
+        note: "iEvents 切版未見複製按鈕，程式加按鈕 + 後端 clone 邏輯"
+      },
+      {
+        name: "活動列表篩選",
+        sub: "依分類 / 狀態",
+        status: "ok",
+        ievents: "/html/event.php",
+        note: "iEvents 活動首頁有篩選"
+      },
+      {
+        name: "自訂網址",
+        sub: "主網域 / 自訂名稱",
+        status: "ok",
+        ievents: "/html/eventSetting.php",
+        note: "iEvents 活動設定含自訂網址欄位"
+      },
+      {
+        name: "活動分類管理",
+        status: "new",
+        ievents: null,
+        note: "iEvents 無分類管理模組，程式全新做（CRUD + 排序 + 使用中無法刪除）"
+      },
+      {
+        name: "活動標籤管理",
+        status: "new",
+        ievents: null,
+        note: "iEvents 無標籤系統，程式全新做（一活動多標籤）"
+      },
+      {
+        name: "驗證設定",
+        sub: "會員 / Email / 手機",
+        status: "partial",
+        ievents: "/html/eventSetting.php + /html/eventNotification.php",
+        note: "iEvents 有審核機制，驗證方式的完整性程式依介面補"
+      },
+      {
+        name: "文案 4 區塊編輯器",
+        sub: "內容說明 / 注意事項 / 報名完成 / 同意條款",
+        status: "partial",
+        ievents: "/html/eventSetting.php",
+        note: "[Q2] iEvents 切版可能只有 1-2 個文案編輯器，程式依承興介面做到 4 個區塊"
+      },
+      {
+        name: "QR Code 設定",
+        sub: "啟用 + 共用碼 / 會員專屬碼",
+        status: "new",
+        ievents: "/html/eventCodeDl.php",
+        note: "[Q3] iEvents 有 QR Code 下載頁但類型切換功能未見，需額外開發 2 種類型邏輯"
+      },
+      {
+        name: "SEO 設定",
+        sub: "Meta Title / Keywords / Description",
+        status: "new",
+        ievents: null,
+        note: "iEvents 切版無 SEO 設定頁，程式全新做（3 個欄位）"
+      }
+    ]
+  },
+  {
+    title: "3. 報名系統管理",
+    price: "$30,000",
+    items: [
+      {
+        name: "動態報名欄位（預設 4 個）",
+        sub: "姓名、Email、手機、進場人數",
+        status: "partial",
+        ievents: "/html/eventSignUp.php",
+        note: "iEvents 預設只 2 個（姓名、信箱），差 2 個（手機、進場人數）請程式補上"
+      },
+      {
+        name: "自訂欄位型態（11-13 種）",
+        sub: "字串 / 數字 / Email / 網址 / 文字框 / 日期 / 日期時間 / 下拉 / 單選 / 多選 / 縣市 / 地址",
+        status: "partial",
+        ievents: "/html/eventSignUp.php",
+        note: "[Q4] iEvents 切版目前只看到 3 種（單行、單選、多選），請程式補其餘 8-10 種欄位型態"
+      },
+      {
+        name: "欄位拖拽排序",
+        status: "ok",
+        ievents: "/html/eventSignUp.php",
+        note: "iEvents 已有 drag_indicator 排序功能"
+      },
+      {
+        name: "必填設定",
+        status: "ok",
+        ievents: "/html/eventSignUp.php",
+        note: "iEvents 欄位可設必填"
+      },
+      {
+        name: "多場次管理",
+        sub: "時段 / 人數限額 / 額滿",
+        status: "ok",
+        ievents: "/html/eventSession.php",
+        note: "iEvents 場次管理完整"
+      },
+      {
+        name: "多場次報名規則",
+        sub: "不限 / 每天 N 次 / 展期 N 次",
+        status: "partial",
+        ievents: "/html/eventSession.php",
+        note: "[Q5] iEvents 場次規則彈性不確定，請程式依承興 3 種規則補實作"
+      },
+      {
+        name: "報名資料查詢 / 篩選 / 搜尋",
+        status: "ok",
+        ievents: "/html/eventRegister.php + /html/eventRegisterDetail.php",
+        note: "iEvents 名單管理對應完整"
+      },
+      {
+        name: "報名詳情 / 編輯 / 取消 / 取消核銷",
+        status: "ok",
+        ievents: "/html/eventRegisterDetail.php",
+        note: "iEvents 名單詳細頁可對應（原為彈窗）"
+      },
+      {
+        name: "報名狀態",
+        sub: "待核銷 / 已核銷 / 部分核銷 / 已取消",
+        status: "new",
+        ievents: null,
+        note: "[Q6] iEvents 原本沒有此狀態機制，核銷系統要額外製作狀態管理"
+      },
+      {
+        name: "報名資料匯出 CSV",
+        status: "new",
+        ievents: "/html/eventRegister.php",
+        note: "[Q7] iEvents 切版未明確提匯出按鈕，請程式製作 CSV 匯出功能（前端按鈕 + 後端產檔）"
+      },
+      {
+        name: "欄位設定彈窗",
+        status: "ok",
+        ievents: "/html/eventRegisterCol.php",
+        note: "iEvents 原為彈窗，可直接用"
+      }
+    ]
+  },
+  {
+    title: "4. QR Code 系統管理（含離線核銷 + 識別證）",
+    price: "$70,000",
+    items: [
+      {
+        name: "手機 / 平板核銷介面",
+        status: "ok",
+        ievents: "/html/checkinFlow.php",
+        note: "iEvents 報到掃描切版可用"
+      },
+      {
+        name: "活動執行登入",
+        status: "ok",
+        ievents: "/onsite/#/auth/login",
+        note: "iEvents 有獨立現場登入頁"
+      },
+      {
+        name: "活動執行 Dashboard",
+        status: "ok",
+        ievents: "/onsite/#/dashboard/home + /onsite/#/dashboard/execute",
+        note: "iEvents 現場工作台介面可用"
+      },
+      {
+        name: "掃描結果（綠 成功 / 紅 失敗 / 淺藍 人工）",
+        status: "ok",
+        ievents: "/html/checkinFlow.php",
+        note: "[Q8] UI 配色沒問題，依 iEvents 切版套用即可"
+      },
+      {
+        name: "掃描失敗原因顯示",
+        sub: "已報到 / 非本活動 / 報名不存在",
+        status: "partial",
+        ievents: "/html/checkinFlow.php",
+        note: "iEvents 有失敗介面，具體訊息內容程式依承興需求調整"
+      },
+      {
+        name: "手動輸入報名編號",
+        sub: "QR 無法掃時",
+        status: "partial",
+        ievents: "/html/checkinFlow.php",
+        note: "iEvents 切版有類似功能，程式依介面確認"
+      },
+      {
+        name: "人工確認介面",
+        sub: "淺藍色",
+        status: "new",
+        ievents: null,
+        note: "iEvents 切版未見獨立人工確認頁，程式新做或整合進現有核銷流程"
+      },
+      {
+        name: "核銷時間限制",
+        status: "new",
+        ievents: null,
+        note: "iEvents 無此邏輯，程式新做"
+      },
+      {
+        name: "進場次數（N 次 / M 次）",
+        sub: "展覽可設每張票進 2 次",
+        status: "new",
+        ievents: null,
+        note: "iEvents 無此邏輯，程式新做"
+      },
+      {
+        name: "連續掃描",
+        sub: "核銷後自動跳回",
+        status: "partial",
+        ievents: "/html/checkinFlow.php",
+        note: "iEvents 切版可能有，程式確認流程"
+      },
+      {
+        name: "報名查詢核銷",
+        sub: "姓名 / 手機 / Email",
+        status: "ok",
+        ievents: "/html/checkinLookup.php",
+        note: "iEvents 報到查詢對應完整"
+      },
+      {
+        name: "核銷設備管理",
+        sub: "多設備 + 入口 A/B/VIP",
+        status: "partial",
+        ievents: "/html/activeCode.php",
+        note: "[Q9] iEvents 有啟動碼概念類似但非完全等同，程式處理：擴充「設備綁定活動」功能（VIP 入口只核銷 VIP 場次）"
+      },
+      {
+        name: "設備核銷紀錄 / 統計",
+        status: "ok",
+        ievents: "/html/checkinStatistic.php",
+        note: "iEvents 有報到統計可用"
+      },
+      {
+        name: "後台核銷紀錄管理",
+        sub: "時間 / 設備 / 工作人員 / 取消核銷",
+        status: "partial",
+        ievents: "/html/checkinLookup.php + /html/checkinStatistic.php",
+        note: "iEvents 有查詢和統計，「取消核銷」功能程式補"
+      },
+      {
+        name: "★ 離線核銷 — PWA 運作",
+        status: "new",
+        ievents: null,
+        note: "★ 承興核心需求。iEvents 純線上無 PWA，程式全新做（Service Worker + Manifest）"
+      },
+      {
+        name: "★ 離線核銷 — 預先下載資料",
+        status: "new",
+        ievents: null,
+        note: "★ 程式全新做（IndexedDB 儲存報名資料）"
+      },
+      {
+        name: "★ 離線核銷 — 自動切換離線",
+        status: "new",
+        ievents: null,
+        note: "★ 程式全新做（navigator.onLine 偵測）"
+      },
+      {
+        name: "★ 離線核銷 — 暫存核銷紀錄",
+        status: "new",
+        ievents: null,
+        note: "★ 程式全新做（IndexedDB 佇列機制）"
+      },
+      {
+        name: "★ 離線核銷 — 網路恢復自動同步",
+        status: "new",
+        ievents: null,
+        note: "★ 程式全新做（Background Sync / 輪詢）"
+      },
+      {
+        name: "★ 狀態列",
+        sub: "網路 / 離線 / DB / 待上傳",
+        status: "new",
+        ievents: null,
+        note: "★ 程式新做底部狀態列元件"
+      },
+      {
+        name: "★ 手動清除離線資料庫",
+        status: "new",
+        ievents: null,
+        note: "★ 程式新做按鈕 + 邏輯"
+      },
+      {
+        name: "識別證版面 — 尺寸 + 背景圖",
+        sub: "預設 9x13cm",
+        status: "ok",
+        ievents: "/winnie/eventBadge.php",
+        note: "iEvents 識別證管理完整"
+      },
+      {
+        name: "識別證版面 — QR Code 位置",
+        status: "ok",
+        ievents: "/winnie/badgeEditor.php",
+        note: "iEvents 編輯器可拖拉定位"
+      },
+      {
+        name: "識別證版面 — 文字欄位",
+        sub: "位置 / 字型 / 大小 / 顏色",
+        status: "ok",
+        ievents: "/winnie/badgeEditor.php",
+        note: "iEvents 編輯器完整支援"
+      },
+      {
+        name: "識別證 — 變數帶入",
+        sub: "姓名 / 公司 / 職稱",
+        status: "ok",
+        ievents: "/winnie/badgeEditor.php",
+        note: "iEvents 用 ==欄位名稱== 語法，對應完整"
+      },
+      {
+        name: "識別證預覽",
+        status: "ok",
+        ievents: "/winnie/badgeEditor.php",
+        note: "iEvents 編輯器可預覽"
+      }
+    ]
+  },
+  {
+    title: "5. 追蹤碼管理（埋點）",
+    price: "$20,000",
+    items: [
+      {
+        name: "全域追蹤碼",
+        sub: "活動所有頁面生效",
+        status: "new",
+        ievents: null,
+        note: "iEvents 無追蹤碼設定頁，程式新做"
+      },
+      {
+        name: "活動介紹頁追蹤碼",
+        status: "new",
+        ievents: null,
+        note: "程式新做"
+      },
+      {
+        name: "報名頁追蹤碼",
+        status: "new",
+        ievents: null,
+        note: "程式新做"
+      },
+      {
+        name: "報名成功頁追蹤碼",
+        status: "new",
+        ievents: null,
+        note: "程式新做（報價不含部門 / 人員 / 媒體管理，只做 4 個埋點）"
+      }
+    ]
+  },
+  {
+    title: "6. 通知信件系統管理（6 類信件）",
+    price: "$15,000",
+    items: [
+      {
+        name: "會員註冊完成信",
+        status: "ok",
+        ievents: "/html/eventEmail.php + /html/eventEmailTemp.php + /html/eventEmailEdit.php",
+        note: "iEvents Email 系統完整可用，建立範本即可"
+      },
+      {
+        name: "會員忘記密碼信",
+        status: "ok",
+        ievents: "同上",
+        note: "建範本"
+      },
+      {
+        name: "會員密碼變更確認信",
+        status: "ok",
+        ievents: "同上",
+        note: "建範本"
+      },
+      {
+        name: "訂單通知（給會員）",
+        status: "ok",
+        ievents: "同上",
+        note: "建範本"
+      },
+      {
+        name: "訂單通知（給管理者）",
+        status: "ok",
+        ievents: "同上",
+        note: "建範本"
+      },
+      {
+        name: "訂單取消通知（給管理者）",
+        status: "ok",
+        ievents: "同上",
+        note: "建範本"
+      },
+      {
+        name: "後台編輯信件主旨",
+        status: "ok",
+        ievents: "/html/eventEmailEdit.php",
+        note: "iEvents 信件編輯器可用"
+      },
+      {
+        name: "後台編輯信件內容（富文本）",
+        status: "ok",
+        ievents: "/html/eventEmailEdit.php",
+        note: "iEvents 有編輯器"
+      },
+      {
+        name: "郵件伺服器設定（SMTP）",
+        status: "ok",
+        ievents: "/html/eventEmailServer.php",
+        note: "iEvents 額外有 SMTP 設定頁，承興可用"
+      }
+    ]
+  },
+  {
+    title: "7. 會員系統管理",
+    price: "$32,607",
+    items: [
+      {
+        name: "一般註冊",
+        sub: "Email + 驗證信",
+        status: "ok",
+        ievents: "/html/register.php",
+        note: "iEvents 註冊頁完整可用"
+      },
+      {
+        name: "LINE 註冊 / 登入",
+        status: "new",
+        ievents: null,
+        note: "iEvents 無社群登入，程式新做（承興之前已做過經驗可沿用）"
+      },
+      {
+        name: "Google 註冊 / 登入",
+        status: "new",
+        ievents: null,
+        note: "iEvents 無，程式新做"
+      },
+      {
+        name: "帳號密碼登入",
+        status: "ok",
+        ievents: "/html/login.php",
+        note: "iEvents 登入頁可用"
+      },
+      {
+        name: "忘記密碼",
+        sub: "Email 重設",
+        status: "ok",
+        ievents: "/html/login.php Modal + /html/resetPW.php",
+        note: "iEvents 完整對應"
+      },
+      {
+        name: "密碼變更",
+        status: "ok",
+        ievents: "/html/memberInfo.php",
+        note: "iEvents 帳戶資料內處理"
+      },
+      {
+        name: "前台修改會員資料",
+        status: "ok",
+        ievents: "/html/memberInfo.php",
+        note: "iEvents 帳戶資料頁可用"
+      },
+      {
+        name: "會員登入後查報名紀錄",
+        status: "ok",
+        ievents: "/html/eventRegister.php",
+        note: "iEvents 有名單可對應"
+      },
+      {
+        name: "後台新增 / 修改 / 刪除 會員",
+        status: "partial",
+        ievents: "/html/eventRegister.php",
+        note: "iEvents 是報名名單概念，需確認是否為會員管理，可能程式補後台會員 CRUD"
+      },
+      {
+        name: "會員搜尋（條件 + 模糊）",
+        status: "ok",
+        ievents: "/html/eventRegister.php",
+        note: "iEvents 有搜尋"
+      },
+      {
+        name: "舊會員名單匯入",
+        sub: "從 acumen 舊系統",
+        status: "new",
+        ievents: null,
+        note: "承興特殊需求，程式新做匯入工具（欄位對應 + 驗證）"
+      },
+      {
+        name: "後台會員匯入 / 匯出",
+        status: "new",
+        ievents: null,
+        note: "程式新做 CSV 匯入匯出功能"
+      }
+    ]
+  },
+  {
+    title: "8. 購物功能管理（訂單）",
+    price: "$13,000",
+    items: [
+      {
+        name: "購物車機制",
+        status: "new",
+        ievents: null,
+        note: "iEvents 完全沒有購物車，程式全新做"
+      },
+      {
+        name: "購物明細頁",
+        status: "new",
+        ievents: null,
+        note: "程式新做（切版頁數含在報價 21 頁內）"
+      },
+      {
+        name: "購物確認頁",
+        status: "new",
+        ievents: null,
+        note: "程式新做"
+      },
+      {
+        name: "未登入可加入購物車",
+        status: "new",
+        ievents: null,
+        note: "程式新做（Local Storage / Session）"
+      },
+      {
+        name: "登入才能付款",
+        status: "new",
+        ievents: null,
+        note: "程式新做（流程控制）"
+      },
+      {
+        name: "填收件資料（勾選「與會員相同」）",
+        status: "new",
+        ievents: null,
+        note: "程式新做表單 + 自動帶入"
+      },
+      {
+        name: "後台訂單查詢 / 搜尋",
+        sub: "編號 / 客戶名 / 關鍵字",
+        status: "new",
+        ievents: null,
+        note: "iEvents 無訂單概念，程式全新做"
+      },
+      {
+        name: "訂單匯出",
+        status: "new",
+        ievents: null,
+        note: "程式新做"
+      }
+    ]
+  },
+  {
+    title: "9. 串接金流",
+    price: "$10,000",
+    items: [
+      {
+        name: "藍新金流串接（一次性刷卡）",
+        status: "new",
+        ievents: "/html/eventPayment.php",
+        note: "iEvents 有藍新設定切版（商家代號、Hash Key、Hash IV），但金流串接程式需新做。分期付款另議"
+      }
+    ]
+  },
+  {
+    title: "10. 隱藏項目（iEvents 有 / 報價沒）",
+    price: "—",
+    items: [
+      {
+        name: "帳戶方案管理",
+        sub: "SaaS 訂閱方案",
+        status: "hide",
+        ievents: "/html/memberPlan.php",
+        note: "承興是單一客戶非 SaaS，設計端隱藏"
+      },
+      {
+        name: "點數使用紀錄",
+        status: "hide",
+        ievents: "/html/pointLog.php",
+        note: "iEvents 本身也未完成，承興不需要，隱藏"
+      },
+      {
+        name: "環境設定（部分）",
+        status: "hide",
+        ievents: "/html/envSetting.php",
+        note: "SaaS 帳戶層級設定，承興用不到，可簡化或隱藏"
+      },
+      {
+        name: "問卷管理",
+        status: "hide",
+        ievents: "/html/eventSurvey.php + eventSurveyEdit.php + eventSurveyPreview.php",
+        note: "報價未含問卷功能，設計端隱藏"
+      },
+      {
+        name: "來賓專屬頁",
+        status: "hide",
+        ievents: "/html/guestPage.php + guestPagePreview.php",
+        note: "報價未含，設計端隱藏"
+      },
+      {
+        name: "SMS 管理",
+        sub: "eventSms + eventSmsEdit",
+        status: "hide",
+        ievents: "/html/eventSms.php + /html/eventSmsEdit.php",
+        note: "報價只做 Email 通知，SMS 不做，隱藏"
+      },
+      {
+        name: "票券種類",
+        status: "hide",
+        ievents: "/html/eventTicketType.php",
+        note: "[Q10] 程式可處理。承興用「活動」+「進場人數」不分票種，可隱藏或保留做 VIP/一般分級"
+      },
+      {
+        name: "健康聲明表單",
+        status: "hide",
+        ievents: null,
+        note: "iEvents 本身也未製作（疫情時期產物），不做"
+      }
+    ]
+  }
+];
+
+// =====================================================
+// 渲染
+// =====================================================
+const STATUS_LABEL = {
+  ok: '可用',
+  partial: '部分可用',
+  new: '需新做',
+  hide: '隱藏'
+};
+
+const canvas = document.getElementById('canvas');
+const stats = { ok: 0, partial: 0, new: 0, hide: 0 };
+
+sections.forEach((sec, si) => {
+  const section = document.createElement('section');
+  section.className = 'section';
+
+  const head = document.createElement('div');
+  head.className = 'section-head';
+  head.innerHTML = `
+    <div class="section-index">${si + 1}</div>
+    <div class="section-title">${sec.title}</div>
+    <div class="section-price">${sec.price}</div>
+    <div class="section-toggle">▾</div>
+  `;
+  head.addEventListener('click', () => section.classList.toggle('collapsed'));
+  section.appendChild(head);
+
+  const body = document.createElement('div');
+  body.className = 'section-body';
+
+  const cards = document.createElement('div');
+  cards.className = 'cards';
+
+  sec.items.forEach(item => {
+    stats[item.status]++;
+
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.dataset.status = item.status;
+
+    const statusLabel = STATUS_LABEL[item.status];
+    const ieventsHtml = item.ievents
+      ? `<div class="card-ievents"><span class="label">iEvents</span>${escapeHtml(item.ievents)}</div>`
+      : `<div class="card-ievents empty"><span class="label">iEvents</span>無對應切版</div>`;
+
+    const noteHtml = item.note
+      ? `<div class="card-note ${item.status === 'hide' ? 'plain' : ''}"><span class="label">備註給程式</span>${escapeHtml(item.note)}</div>`
+      : '';
+
+    card.innerHTML = `
+      <div class="card-head">
+        <div class="card-name">${escapeHtml(item.name)}${item.sub ? `<span class="sub">${escapeHtml(item.sub)}</span>` : ''}</div>
+        <span class="status-tag ${item.status}">${statusLabel}</span>
+      </div>
+      ${ieventsHtml}
+      ${noteHtml}
+    `;
+    cards.appendChild(card);
+  });
+
+  body.appendChild(cards);
+  section.appendChild(body);
+  canvas.appendChild(section);
+});
+
+// 統計
+const total = stats.ok + stats.partial + stats.new + stats.hide;
+document.getElementById('stat-total').textContent = total;
+document.getElementById('stat-ok').textContent = stats.ok;
+document.getElementById('stat-partial').textContent = stats.partial;
+document.getElementById('stat-new').textContent = stats.new;
+document.getElementById('stat-hide').textContent = stats.hide;
+document.getElementById('count-all').textContent = total;
+document.getElementById('count-ok').textContent = stats.ok;
+document.getElementById('count-partial').textContent = stats.partial;
+document.getElementById('count-new').textContent = stats.new;
+document.getElementById('count-hide').textContent = stats.hide;
+
+// 篩選
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const filter = btn.dataset.filter;
+    document.querySelectorAll('.card').forEach(card => {
+      if (filter === 'all' || card.dataset.status === filter) {
+        card.classList.remove('hidden');
+      } else {
+        card.classList.add('hidden');
+      }
+    });
+    // Hide empty sections
+    document.querySelectorAll('.section').forEach(section => {
+      const visibleCards = section.querySelectorAll('.card:not(.hidden)').length;
+      section.style.display = visibleCards === 0 ? 'none' : '';
+    });
+  });
+});
+
+function escapeHtml(s) {
+  if (s == null) return '';
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+</script>
+
+</body>
+</html>
