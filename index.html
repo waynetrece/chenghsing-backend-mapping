@@ -3,1093 +3,1825 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>承興 vs iEvents 架構對照</title>
+<title>iEvents 切版規格文件</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  :root {
-    --brand: #1a2d5c;
-    --bg: #ffffff;
-    --bg-soft: #f7f8fa;
-    --text-1: #1a2d5c;
-    --text-2: #4a5568;
-    --text-3: #718096;
-    --text-4: #a0aec0;
-    --border: #e2e8f0;
-    --border-soft: #edf0f4;
 
-    /* status colors */
-    --st-ok: #10b981;          /* 可用 綠 */
-    --st-ok-soft: #d1fae5;
-    --st-partial: #f59e0b;     /* 部分 黃 */
-    --st-partial-soft: #fef3c7;
-    --st-new: #ef4444;         /* 需新做 紅 */
-    --st-new-soft: #fee2e2;
-    --st-hide: #6b7280;        /* 隱藏 灰 */
-    --st-hide-soft: #f3f4f6;
+  /* =========================================================
+     Theme Variables — 3 Styles
+     ========================================================= */
+  /* S01 Tech Minimal (default) */
+  .theme-s01 {
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #F8F9FA;
+    --text-primary: #1A1A1A;
+    --text-secondary: #6B7280;
+    --text-muted: #9CA3AF;
+    --brand: #3B82F6;
+    --accent: #10B981;
+    --border-strong: #E5E7EB;
+    --border-subtle: #F3F4F6;
+    --danger: #EF4444;
+    --warning: #F59E0B;
+    --success: #10B981;
+    --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", "Noto Sans TC", sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
+    --border-width: 1px;
+    --section-py: 32px;
   }
-  body {
-    background: var(--bg);
-    color: var(--text-1);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", "PingFang TC", sans-serif;
+  /* S03 Swiss / International Typographic — 調整版（深色 + 中等放大） */
+  .theme-s03 {
+    --bg-primary: #F2F2EC;
+    --bg-secondary: #E2E2DA;
+    --text-primary: #000000;
+    --text-secondary: #1F1F1F;
+    --text-muted: #6B6B6B;
+    --brand: #B91C1C;
+    --accent: #1D4ED8;
+    --border-strong: #000000;
+    --border-subtle: #000000;
+    --danger: #B91C1C;
+    --warning: #B45309;
+    --success: #047857;
+    --font-sans: "Helvetica Neue", Helvetica, "Noto Sans TC", Arial, sans-serif;
+    --font-mono: "Space Mono", monospace;
+    --radius-sm: 0;
+    --radius-md: 0;
+    --radius-lg: 0;
+    --shadow-sm: none;
+    --shadow-md: none;
+    --border-width: 2px;
+    --section-py: 44px;
+  }
+  /* S03 調整版 — 字體略放大（比標準大、比加強小） */
+  .theme-s03 .module-title { font-size: 34px; line-height: 1.2; font-weight: 800; letter-spacing: -0.02em; }
+  .theme-s03 .panel-title { font-size: 24px; font-weight: 800; letter-spacing: -0.015em; }
+  .theme-s03 .section h3 { font-size: 17px; font-weight: 700; }
+  .theme-s03 .module-desc { font-size: 14px; }
+  .theme-s03 .panel-desc { font-size: 14px; }
+  .theme-s03 .tab { font-size: 14px; font-weight: 700; }
+  .theme-s03 .tab.active { border-bottom-width: 3px; }
+  /* 清爽風表格（像圖 2）— 淺色頭部、無陰影、只用底線分隔 */
+  .theme-s03 .overview-table, .theme-s03 .spec-table {
     font-size: 14px;
+    background: transparent;
+    border: 2px solid var(--border-strong);
+  }
+  .theme-s03 .overview-table th, .theme-s03 .spec-table th {
+    background: transparent;
+    padding: 14px 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    font-size: 12px;
+    border-bottom: 2px solid var(--border-strong);
+  }
+  .theme-s03 .overview-table td, .theme-s03 .spec-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(0,0,0,0.12);
+  }
+  .theme-s03 .overview-table tr:hover,
+  .theme-s03 .spec-table tr:hover { background: rgba(0,0,0,0.03); }
+  .theme-s03 .section { margin: 32px 0; }
+  .theme-s03 .header h1 { font-size: 18px; font-weight: 800; }
+  .theme-s03 .nav-item { font-weight: 600; }
+  /* S03+ Swiss Enhanced — 加強版（更大氣、更留白） */
+  .theme-s03-plus {
+    --bg-primary: #F5F5F0;
+    --bg-secondary: #EAEAEA;
+    --text-primary: #000000;
+    --text-secondary: #1A1A1A;
+    --text-muted: #7A7A7A;
+    --brand: #E02424;
+    --accent: #0055FF;
+    --border-strong: #000000;
+    --border-subtle: #000000;
+    --danger: #E02424;
+    --warning: #E3A008;
+    --success: #0E9F6E;
+    --font-sans: "Helvetica Neue", Helvetica, "Noto Sans TC", Arial, sans-serif;
+    --font-mono: "Space Mono", monospace;
+    --radius-sm: 0;
+    --radius-md: 0;
+    --radius-lg: 0;
+    --shadow-sm: none;
+    --shadow-md: none;
+    --border-width: 3px;
+    --section-py: 64px;
+  }
+  /* 加強版獨有樣式（字體大、留白多、黑表頭） */
+  .theme-s03-plus .module-title { font-size: 54px; line-height: 1.1; font-weight: 900; letter-spacing: -0.03em; }
+  .theme-s03-plus .panel-title { font-size: 38px; font-weight: 900; letter-spacing: -0.02em; }
+  .theme-s03-plus .section h3 { font-size: 22px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.02em; }
+  .theme-s03-plus .section h3::before { width: 7px; height: 26px; background: var(--brand); }
+  .theme-s03-plus .module-desc { font-size: 18px; max-width: 60ch; }
+  .theme-s03-plus .panel-desc { font-size: 17px; max-width: 60ch; }
+  .theme-s03-plus .tab { padding: 16px 20px; font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+  .theme-s03-plus .tab.active { border-bottom-width: 4px; }
+  .theme-s03-plus .module-header { border-bottom-width: 4px; padding-bottom: 32px; margin-bottom: 40px; }
+  .theme-s03-plus .section { margin: 40px 0; }
+  /* 加強版表格：乾淨俐落（保留瑞士風格但不擁擠）*/
+  .theme-s03-plus .overview-table,
+  .theme-s03-plus .spec-table {
+    border: 2px solid #000;
+    font-size: 14px;
+    table-layout: auto;
+    width: 100%;
+    background: transparent;
+  }
+  .theme-s03-plus .overview-table th,
+  .theme-s03-plus .spec-table th {
+    padding: 14px 16px;
+    background: transparent;
+    color: #000;
+    font-size: 13px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-bottom: 3px solid #000;
+  }
+  .theme-s03-plus .overview-table td,
+  .theme-s03-plus .spec-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(0,0,0,0.15);
+    font-size: 16px;
     line-height: 1.6;
   }
+  .theme-s03-plus .overview-table tr:last-child td,
+  .theme-s03-plus .spec-table tr:last-child td { border-bottom: none; }
+  .theme-s03-plus .overview-table tbody tr:nth-child(even),
+  .theme-s03-plus .spec-table tbody tr:nth-child(even) { background: rgba(0,0,0,0.025); }
+  .theme-s03-plus .overview-table tbody tr:hover,
+  .theme-s03-plus .spec-table tbody tr:hover { background: rgba(224,36,36,0.06); cursor: default; }
+  .theme-s03-plus .spec-table .required { color: var(--brand); font-size: 18px; }
+  .theme-s03-plus .panel-eyebrow {
+    background: var(--brand);
+    color: #fff;
+    font-size: 14px;
+    padding: 5px 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border-radius: 0;
+  }
+  .theme-s03-plus .module-eyebrow {
+    font-size: 15px;
+    color: var(--brand);
+    font-weight: 900;
+    letter-spacing: 0.12em;
+  }
+  .theme-s03-plus .callout {
+    border-left-width: 6px;
+    padding: 18px 22px;
+    font-size: 16px;
+  }
+  .theme-s03-plus .tabs { padding-top: 12px; }
+  .theme-s03-plus .chip {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-width: 2px;
+    padding: 4px 12px;
+  }
+  .theme-s03-plus .header h1 { font-size: 22px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.02em; }
+  .theme-s03-plus .header { border-bottom-width: 3px; }
+  .theme-s03-plus .sidebar { border-right-width: 3px; }
+  .theme-s03-plus .nav-item { border-left-width: 4px; font-weight: 700; font-size: 15px; text-transform: uppercase; letter-spacing: 0.03em; }
+  .theme-s03-plus .nav-item.active {
+    background: #000;
+    color: #fff;
+    border-left-color: var(--brand);
+  }
+  .theme-s03-plus .nav-item.active svg { color: #fff; }
+  .theme-s03-plus .nav-item .badge { background: transparent; border-width: 2px; }
 
+  /* S09 Corporate Clean */
+  .theme-s09 {
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #F9FAFB;
+    --text-primary: #111827;
+    --text-secondary: #374151;
+    --text-muted: #6B7280;
+    --brand: #1E40AF;
+    --accent: #3B82F6;
+    --border-strong: #D1D5DB;
+    --border-subtle: #F3F4F6;
+    --danger: #DC2626;
+    --warning: #D97706;
+    --success: #059669;
+    --font-sans: "Inter", system-ui, -apple-system, "Noto Sans TC", sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, monospace;
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 8px;
+    --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+    --border-width: 1px;
+    --section-py: 32px;
+  }
+
+  html, body { overflow-x: clip; }
+  body {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 17px;
+    line-height: 1.7;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  /* Inline SVG icons */
+  .icon {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+    vertical-align: -3px;
+  }
+  .icon-lg { width: 20px; height: 20px; vertical-align: -4px; }
+  .icon-xl { width: 40px; height: 40px; }
+
+  /* =========================================================
+     Header
+     ========================================================= */
   .header {
     position: sticky; top: 0; z-index: 100;
-    background: #fff;
-    border-bottom: 1px solid var(--border);
-    padding: 18px 40px;
+    background: var(--bg-primary);
+    border-bottom: var(--border-width) solid var(--border-strong);
+    padding: 18px 36px;
     display: flex; align-items: center; justify-content: space-between;
-    box-shadow: 0 1px 4px rgba(26,45,92,0.04);
+    box-shadow: var(--shadow-sm);
   }
   .header-left { display: flex; align-items: center; gap: 16px; }
   .header-logo {
-    width: 36px; height: 36px; border-radius: 8px;
+    width: 40px; height: 40px;
+    border-radius: var(--radius-md);
     background: var(--brand); color: #fff;
     display: flex; align-items: center; justify-content: center;
-    font-weight: 700; font-size: 14px;
+    font-weight: 700; font-size: 15px;
   }
-  .header h1 { font-size: 18px; color: var(--text-1); font-weight: 700; }
-  .header h1 .sub { font-size: 12px; color: var(--text-3); font-weight: 400; margin-left: 10px; }
+  .header h1 {
+    font-size: 18px;
+    color: var(--text-primary);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .header h1 .sub {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 400;
+    margin-left: 12px;
+  }
+  .header-right { display: flex; align-items: center; gap: 14px; }
+  .header-meta { font-size: 13px; color: var(--text-muted); }
 
-  .summary-bar {
-    background: var(--bg-soft);
-    border-bottom: 1px solid var(--border-soft);
-    padding: 18px 40px;
+  /* Theme switcher */
+  .theme-switcher {
+    display: inline-flex;
+    border: var(--border-width) solid var(--border-strong);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: var(--bg-primary);
   }
-  .stats { display: flex; gap: 28px; flex-wrap: wrap; align-items: center; }
-  .stat { display: flex; align-items: baseline; gap: 6px; }
-  .stat-num { font-size: 20px; font-weight: 700; }
-  .stat-label { font-size: 12px; color: var(--text-3); }
-  .stat-num.ok { color: var(--st-ok); }
-  .stat-num.partial { color: var(--st-partial); }
-  .stat-num.new { color: var(--st-new); }
-  .stat-num.hide { color: var(--st-hide); }
-
-  .filter-bar {
-    padding: 14px 40px;
-    display: flex; gap: 8px; flex-wrap: wrap;
-    border-bottom: 1px solid var(--border-soft);
-    background: #fff;
-    position: sticky; top: 66px; z-index: 90;
-  }
-  .filter-btn {
-    padding: 7px 16px;
-    border: 1px solid var(--border);
-    background: #fff;
-    border-radius: 20px;
+  .theme-btn {
+    padding: 7px 14px;
+    background: transparent;
+    border: none;
+    border-right: var(--border-width) solid var(--border-strong);
     font-size: 13px;
     font-weight: 600;
-    color: var(--text-2);
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-family: var(--font-sans);
+    transition: all 0.15s;
+  }
+  .theme-btn:last-child { border-right: none; }
+  .theme-btn:hover { background: var(--bg-secondary); color: var(--text-primary); }
+  .theme-btn.active { background: var(--brand); color: #fff; }
+
+  /* =========================================================
+     Layout
+     ========================================================= */
+  .layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    min-height: calc(100vh - 77px);
+  }
+
+  /* Sidebar */
+  .sidebar {
+    background: var(--bg-secondary);
+    border-right: var(--border-width) solid var(--border-strong);
+    padding: 28px 0;
+    position: sticky;
+    top: 77px;
+    height: calc(100vh - 77px);
+    overflow-y: auto;
+  }
+  .sidebar-title {
+    padding: 0 26px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .nav-group { margin-bottom: 20px; }
+  .nav-group-title {
+    padding: 8px 26px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-muted);
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 26px;
+    font-size: 15px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    border-left: 3px solid transparent;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .nav-label {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .nav-item:hover { background: var(--bg-primary); color: var(--text-primary); }
+  .nav-item.active {
+    background: var(--bg-primary);
+    border-left-color: var(--brand);
+    color: var(--brand);
+    font-weight: 600;
+  }
+  .nav-item svg { color: var(--text-muted); flex-shrink: 0; }
+  .nav-item.active svg { color: var(--brand); }
+  .nav-item .badge {
+    margin-left: auto;
+    font-size: 11px;
+    padding: 2px 8px;
+    background: var(--bg-primary);
+    border: var(--border-width) solid var(--border-strong);
+    border-radius: 10px;
+    color: var(--text-muted);
+    font-weight: 500;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .nav-item.pending { color: var(--text-muted); opacity: 0.75; }
+  .nav-item.pending .badge {
+    background: var(--bg-secondary);
+  }
+
+  /* =========================================================
+     Main
+     ========================================================= */
+  .main {
+    padding: 48px 60px 100px;
+    max-width: 1040px;
+  }
+
+  /* Module header */
+  .module-header {
+    margin-bottom: 36px;
+    padding-bottom: 28px;
+    border-bottom: var(--border-width) solid var(--border-subtle);
+  }
+  .module-eyebrow {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 12px;
+  }
+  .module-title {
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 14px;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+  }
+  .module-desc {
+    font-size: 15px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    max-width: 720px;
+  }
+  .module-meta {
+    display: flex; gap: 12px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+  .meta-item {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 14px;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 6px 14px;
+    border-radius: var(--radius-md);
+    border: var(--border-width) solid var(--border-subtle);
+  }
+  .meta-item strong { color: var(--text-primary); font-weight: 600; }
+
+  /* =========================================================
+     Subpage Tabs (Option A)
+     ========================================================= */
+  .tabs {
+    display: flex;
+    gap: 2px;
+    border-bottom: var(--border-width) solid var(--border-strong);
+    margin-bottom: 36px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    position: sticky;
+    top: 77px;
+    background: var(--bg-primary);
+    z-index: 50;
+    padding-top: 12px;
+    scrollbar-width: thin;
+  }
+  .tabs::-webkit-scrollbar { height: 4px; }
+  .tabs::-webkit-scrollbar-thumb { background: var(--border-strong); }
+  .tab {
+    padding: 12px 18px;
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: -1px;
+    white-space: nowrap;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .tab-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    line-height: 1.3;
+  }
+  .tab-title { display: inline-flex; align-items: baseline; gap: 6px; }
+  .tab-path {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 400;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .tab-path:hover {
+    color: var(--brand);
+    text-decoration: underline;
+  }
+  .tab.active .tab-path { color: var(--brand); opacity: 0.85; }
+  .tab:hover { color: var(--text-primary); }
+  .tab.active {
+    color: var(--brand);
+    border-bottom-color: var(--brand);
+  }
+  .tab .tab-num {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  .tab.active .tab-num { color: var(--brand); }
+
+  /* Tab panels */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* Table wrapper for horizontal overflow control */
+  .table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: var(--radius-md);
+  }
+
+  .panel-head { margin-bottom: 28px; }
+  .panel-eyebrow {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--brand);
+    background: rgba(59, 130, 246, 0.1);
+    padding: 4px 12px;
+    border-radius: var(--radius-md);
+    letter-spacing: 0.5px;
+    margin-bottom: 14px;
+  }
+  .theme-s03 .panel-eyebrow { background: rgba(224, 36, 36, 0.1); }
+  .theme-s09 .panel-eyebrow { background: rgba(30, 64, 175, 0.1); }
+
+  .panel-title {
+    font-size: 23px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 10px;
+    letter-spacing: -0.015em;
+  }
+  .panel-url {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 6px 14px;
+    border-radius: var(--radius-sm);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 16px;
+    text-decoration: none;
+    border: var(--border-width) solid var(--border-strong);
+    transition: all 0.15s;
+  }
+  .panel-url:hover {
+    background: var(--bg-primary);
+    color: var(--brand);
+    border-color: var(--brand);
+  }
+  .panel-desc {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+    line-height: 1.7;
+    max-width: 720px;
+  }
+
+  /* =========================================================
+     Sections
+     ========================================================= */
+  .section { margin: 32px 0; }
+  .section h3 {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    letter-spacing: -0.01em;
+  }
+  .section h3::before {
+    content: '';
+    width: 5px;
+    height: 22px;
+    background: var(--brand);
+    border-radius: 2px;
+  }
+  .theme-s03 .section h3::before { border-radius: 0; width: 6px; }
+
+  /* Overview table */
+  .overview-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0 40px;
+    background: var(--bg-primary);
+    border: var(--border-width) solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    font-size: 14px;
+  }
+  .overview-table th {
+    background: var(--bg-secondary);
+    padding: 13px 16px;
+    text-align: left;
+    font-weight: 700;
+    color: var(--text-secondary);
+    border-bottom: var(--border-width) solid var(--border-strong);
+    font-size: 13px;
+    white-space: nowrap;
+  }
+  .overview-table td {
+    padding: 14px 18px;
+    border-bottom: var(--border-width) solid var(--border-subtle);
+    color: var(--text-secondary);
+    vertical-align: top;
+  }
+  .overview-table tr:last-child td { border-bottom: none; }
+  .overview-table tr:hover { background: var(--bg-secondary); cursor: pointer; }
+  .overview-table code {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: var(--radius-sm);
+    color: var(--brand);
+  }
+
+  /* Spec table */
+  .spec-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    background: var(--bg-primary);
+    border: var(--border-width) solid var(--border-strong);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    font-size: 14px;
+  }
+  .spec-table th {
+    background: var(--bg-secondary);
+    padding: 11px 13px;
+    text-align: left;
+    font-weight: 700;
+    color: var(--text-secondary);
+    border-bottom: var(--border-width) solid var(--border-strong);
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .spec-table td {
+    padding: 12px 14px;
+    border-bottom: var(--border-width) solid var(--border-subtle);
+    color: var(--text-secondary);
+    vertical-align: top;
+    line-height: 1.6;
+  }
+  .spec-table tr:last-child td { border-bottom: none; }
+  .spec-table .required {
+    color: var(--danger);
+    font-weight: 700;
+    text-align: center;
+    font-size: 18px;
+  }
+  .spec-table code {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    background: var(--bg-secondary);
+    padding: 2px 7px;
+    border-radius: var(--radius-sm);
+  }
+
+  /* Chips */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    padding: 4px 12px;
+    border-radius: var(--radius-md);
+    background: var(--bg-secondary);
+    color: var(--brand);
+    font-weight: 600;
+    border: var(--border-width) solid var(--border-strong);
+    white-space: nowrap;
+  }
+  .chip.warn { color: var(--warning); }
+  .chip.danger { color: var(--danger); }
+  .chip.success { color: var(--success); }
+
+  /* Callout */
+  .callout {
+    padding: 18px 22px;
+    border-radius: var(--radius-md);
+    margin: 20px 0;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    border-left: 4px solid var(--brand);
+    background: var(--bg-secondary);
+  }
+  .callout.warn { border-left-color: var(--warning); }
+  .callout.danger { border-left-color: var(--danger); }
+  .callout.info { border-left-color: var(--text-muted); }
+  .callout strong { color: var(--text-primary); }
+
+  /* List */
+  ul.clean {
+    list-style: none;
+    padding-left: 0;
+  }
+  ul.clean li {
+    padding: 6px 0 6px 20px;
+    position: relative;
+    color: var(--text-secondary);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+  ul.clean li::before {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 15px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--brand);
+  }
+  .theme-s03 ul.clean li::before { border-radius: 0; }
+  ul.clean li strong { color: var(--text-primary); }
+
+  /* =========================================================
+     Layout Demo styles (for 3-option comparison)
+     ========================================================= */
+  .demo-wrap {
+    margin: 32px 0;
+    padding: 28px;
+    background: var(--bg-secondary);
+    border: 2px dashed var(--border-strong);
+    border-radius: var(--radius-md);
+  }
+  .demo-label {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 900;
+    color: #fff;
+    background: var(--brand);
+    padding: 4px 12px;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .demo-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: var(--text-primary);
+  }
+  .demo-sub {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 18px;
+  }
+
+  /* Placeholder image (styled div) — 小巧、不搶版面 */
+  .ph-img {
+    background:
+      repeating-linear-gradient(45deg, rgba(0,0,0,0.03), rgba(0,0,0,0.03) 10px, transparent 10px, transparent 20px),
+      linear-gradient(135deg, #edf0f4 0%, #e5e9ef 100%);
+    border: 2px solid var(--border-strong);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    padding: 14px;
+    height: 180px;
+    max-height: 180px;
+  }
+  .ph-img .ph-icon { font-size: 22px; margin-bottom: 6px; opacity: 0.5; }
+  @media (max-width: 860px) {
+    .ph-img { height: 120px; max-height: 120px; }
+    .ph-img .ph-icon { font-size: 18px; }
+  }
+
+  /* Real screenshot image */
+  .screenshot {
+    display: block;
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    object-position: top center;
+    border: 2px solid var(--border-strong);
+    background: var(--bg-secondary);
+    cursor: zoom-in;
+    transition: all 0.15s;
+  }
+  .screenshot:hover { opacity: 0.88; }
+  .screenshot-wrap {
+    position: relative;
+  }
+  .screenshot-caption {
+    position: absolute;
+    bottom: 8px; left: 8px;
+    background: rgba(0,0,0,0.7);
+    color: #fff;
+    font-size: 10px;
+    padding: 3px 8px;
+    font-family: var(--font-mono);
+    letter-spacing: 0.02em;
+  }
+  @media (max-width: 860px) {
+    .screenshot { height: 160px; }
+  }
+
+  /* Lightbox */
+  .lightbox {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.88);
+    z-index: 999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    cursor: zoom-out;
+  }
+  .lightbox.active { display: flex; }
+  .lightbox img {
+    max-width: 100%;
+    max-height: 100%;
+    border: 3px solid #fff;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+  }
+  .lightbox-close {
+    position: absolute;
+    top: 20px; right: 20px;
+    background: #fff;
+    border: none;
+    color: #000;
+    font-weight: 900;
+    padding: 8px 16px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  /* Layout A: Side by side — 圖較小、文字佔大部分（用於短表格 / 簡短清單）*/
+  .layout-a {
+    display: grid;
+    grid-template-columns: minmax(200px, 260px) minmax(0, 1fr);
+    gap: 20px;
+    align-items: start;
+  }
+  @media (max-width: 1024px) {
+    .layout-a { grid-template-columns: minmax(160px, 200px) minmax(0, 1fr); gap: 16px; }
+  }
+  @media (max-width: 860px) {
+    .layout-a { grid-template-columns: 1fr; gap: 12px; }
+  }
+
+  /* Layout A-stack: 圖在上方（小）、內容在下方佔滿 — 用於長表格（8+ 列）*/
+  .layout-a.stack {
+    grid-template-columns: 1fr;
+  }
+  .layout-a.stack .screenshot-wrap,
+  .layout-a.stack .ph-img {
+    max-width: 440px;
+    margin-bottom: 6px;
+  }
+
+  /* Layout B: Step-by-step */
+  .layout-b .step {
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    gap: 18px;
+    margin-bottom: 24px;
+  }
+  .layout-b .step-num {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--brand);
+    color: #fff;
+    font-weight: 900;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .layout-b .step-content h5 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .layout-b .step-image { margin-top: 10px; max-width: 480px; }
+
+  /* Layout C: Thumbnails */
+  .layout-c .thumbs {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .layout-c .thumb {
+    width: 120px;
+    aspect-ratio: 16/10;
+    border: 2px solid var(--border-strong);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    color: var(--text-muted);
+    background: #e5e7eb;
     cursor: pointer;
     transition: all 0.15s;
   }
-  .filter-btn:hover { border-color: var(--brand); color: var(--brand); }
-  .filter-btn.active { background: var(--brand); color: #fff; border-color: var(--brand); }
-  .filter-btn .count {
-    display: inline-block;
-    margin-left: 6px;
-    padding: 1px 7px;
-    background: rgba(255,255,255,0.25);
-    border-radius: 10px;
-    font-size: 11px;
-  }
-  .filter-btn:not(.active) .count {
-    background: var(--bg-soft);
-    color: var(--text-3);
+  .layout-c .thumb:hover {
+    border-color: var(--brand);
+    transform: translateY(-2px);
   }
 
-  .canvas { max-width: 1400px; margin: 0 auto; padding: 32px 40px 80px; }
-
-  .section {
-    margin-bottom: 36px;
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
+  /* Pending placeholder */
+  .pending-box {
+    padding: 60px 40px;
+    background: var(--bg-secondary);
+    border: 2px dashed var(--border-strong);
+    border-radius: var(--radius-lg);
+    text-align: center;
+    color: var(--text-muted);
   }
-  .section-head {
-    padding: 16px 24px;
-    background: var(--bg-soft);
-    border-bottom: 1px solid var(--border-soft);
-    display: flex; align-items: center; gap: 14px;
-    cursor: pointer;
-    user-select: none;
-  }
-  .section-head:hover { background: #edf0f4; }
-  .section-index {
-    width: 30px; height: 30px;
-    border-radius: 6px;
-    background: var(--brand); color: #fff;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 700; font-size: 13px;
-    flex-shrink: 0;
-  }
-  .section-title { font-size: 16px; font-weight: 700; color: var(--text-1); }
-  .section-price {
-    margin-left: auto;
-    font-size: 13px; color: var(--text-2);
-    background: #fff;
-    padding: 3px 10px;
-    border: 1px solid var(--border);
-    border-radius: 12px;
+  .pending-box .icon-xl { color: var(--text-muted); margin-bottom: 16px; }
+  .pending-box h3 {
+    font-size: 18px;
+    color: var(--text-primary);
+    margin-bottom: 8px;
     font-weight: 600;
   }
-  .section-toggle {
-    color: var(--text-3);
-    font-size: 14px;
-    transition: transform 0.2s;
-  }
-  .section.collapsed .section-toggle { transform: rotate(-90deg); }
-  .section.collapsed .section-body { display: none; }
 
-  .section-body { padding: 20px 24px; }
-  .cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-    gap: 14px;
+  /* Responsive breakpoints */
+  @media (max-width: 1280px) {
+    .main { padding: 40px 44px 80px; max-width: 100%; }
+    .layout { grid-template-columns: 240px 1fr; }
   }
-
-  .card {
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px 16px;
-    display: flex; flex-direction: column;
-    gap: 10px;
-    transition: border-color 0.15s, box-shadow 0.15s;
+  @media (max-width: 1024px) {
+    .main { padding: 32px 32px 80px; }
+    .layout { grid-template-columns: 220px 1fr; }
+    .module-title { font-size: 28px; }
+    .panel-title { font-size: 22px; }
+    .theme-s03 .module-title { font-size: 32px; }
+    .theme-s03 .panel-title { font-size: 24px; }
   }
-  .card:hover {
-    border-color: var(--brand);
-    box-shadow: 0 4px 14px rgba(26,45,92,0.06);
-  }
-  .card-head {
-    display: flex; align-items: flex-start; gap: 10px;
-    justify-content: space-between;
-  }
-  .card-name {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--text-1);
-    line-height: 1.4;
-  }
-  .card-name .sub {
-    display: block;
-    font-size: 11px;
-    color: var(--text-3);
-    font-weight: 400;
-    margin-top: 2px;
-  }
-  .status-tag {
-    display: inline-flex; align-items: center; gap: 4px;
-    padding: 3px 10px;
-    border-radius: 12px;
-    font-size: 11px;
-    font-weight: 700;
-    flex-shrink: 0;
-    white-space: nowrap;
-  }
-  .status-tag::before {
-    content: '';
-    width: 6px; height: 6px; border-radius: 50%;
-    display: inline-block;
-  }
-  .status-tag.ok { background: var(--st-ok-soft); color: #065f46; }
-  .status-tag.ok::before { background: var(--st-ok); }
-  .status-tag.partial { background: var(--st-partial-soft); color: #92400e; }
-  .status-tag.partial::before { background: var(--st-partial); }
-  .status-tag.new { background: var(--st-new-soft); color: #991b1b; }
-  .status-tag.new::before { background: var(--st-new); }
-  .status-tag.hide { background: var(--st-hide-soft); color: #374151; }
-  .status-tag.hide::before { background: var(--st-hide); }
-
-  .card-ievents {
-    font-size: 12px;
-    color: var(--text-2);
-    background: var(--bg-soft);
-    padding: 8px 10px;
-    border-radius: 6px;
-    border-left: 3px solid var(--border);
-  }
-  .card-ievents .label {
-    display: inline-block;
-    font-size: 10px;
-    font-weight: 700;
-    color: var(--text-3);
-    letter-spacing: 0.5px;
-    margin-right: 6px;
-  }
-  .card-ievents a { color: var(--brand); text-decoration: none; word-break: break-all; }
-  .card-ievents a:hover { text-decoration: underline; }
-  .card-ievents.empty { color: var(--text-4); font-style: italic; }
-
-  .card-note {
-    font-size: 12px;
-    color: var(--text-2);
-    background: #fff7ed;
-    padding: 8px 10px;
-    border-radius: 6px;
-    border-left: 3px solid #fb923c;
-    line-height: 1.5;
-  }
-  .card-note .label {
-    display: inline-block;
-    font-size: 10px;
-    font-weight: 700;
-    color: #9a3412;
-    letter-spacing: 0.5px;
-    margin-right: 6px;
-  }
-  .card-note.plain {
-    background: var(--bg-soft);
-    border-left-color: var(--border);
-  }
-  .card-note.plain .label { color: var(--text-3); }
-
-  .card.hidden { display: none; }
-
-  .footer {
-    max-width: 1400px; margin: 0 auto;
-    padding: 24px 40px 40px;
-    font-size: 12px; color: var(--text-4); text-align: center;
-    border-top: 1px solid var(--border-soft);
-  }
-  .footer a { color: var(--text-3); }
-
-  @media (max-width: 768px) {
-    .header, .summary-bar, .filter-bar, .canvas, .footer {
-      padding-left: 20px; padding-right: 20px;
+  @media (max-width: 860px) {
+    /* Mobile menu toggle approach */
+    .layout { grid-template-columns: 1fr; }
+    .sidebar {
+      position: fixed;
+      top: 0; left: 0;
+      width: 260px; height: 100vh;
+      z-index: 200;
+      transform: translateX(-100%);
+      transition: transform 0.25s;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
     }
-    .cards { grid-template-columns: 1fr; }
-    .filter-bar { top: 66px; }
-    .stats { gap: 16px; }
+    .sidebar.open { transform: translateX(0); }
+    .main { padding: 28px 20px 60px; }
+    .header { padding: 14px 20px; }
+    .header h1 { font-size: 16px; }
+    .header h1 .sub { display: none; }
+    .header-meta { display: none; }
+    .theme-switcher { font-size: 12px; }
+    .theme-btn { padding: 6px 10px; font-size: 12px; }
+    .module-title { font-size: 24px; }
+    .panel-title { font-size: 20px; }
+    .theme-s03 .module-title { font-size: 28px; }
+    .theme-s03 .panel-title { font-size: 22px; }
+    .tabs { padding: 8px 4px; gap: 0; top: 62px; }
+    .tab { padding: 10px 14px; font-size: 13px; }
+    .tab .tab-num { display: none; }
+    .mobile-nav-toggle { display: inline-flex !important; }
+    .sidebar-backdrop {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 150;
+    }
+    .sidebar-backdrop.show { display: block; }
+    .section h3 { font-size: 16px; }
+    .spec-table, .overview-table { font-size: 13px; }
+    .spec-table th, .overview-table th { font-size: 12px; padding: 10px 10px; }
+    .spec-table td, .overview-table td { padding: 10px 10px; }
+  }
+  @media (max-width: 480px) {
+    .main { padding: 20px 16px; }
+    .tab { padding: 8px 10px; font-size: 12px; }
+    .tab svg { display: none; }
+  }
+
+  /* Mobile menu toggle button */
+  .mobile-nav-toggle {
+    display: none;
+    align-items: center; justify-content: center;
+    width: 36px; height: 36px;
+    background: transparent;
+    border: var(--border-width) solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    cursor: pointer;
+    margin-right: 8px;
   }
 </style>
 </head>
-<body>
+<body class="theme-s03-plus">
+
+<!-- SVG Icon Sprite -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <!-- cube/app -->
+    <symbol id="i-app" viewBox="0 0 24 24"><path d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25M21 7.5v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"/></symbol>
+    <!-- calendar -->
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></symbol>
+    <!-- list -->
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol>
+    <!-- clipboard -->
+    <symbol id="i-clipboard" viewBox="0 0 24 24"><rect x="8" y="3" width="8" height="4" rx="1"/><path d="M16 5h2a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2"/></symbol>
+    <!-- users -->
+    <symbol id="i-users" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <!-- mail -->
+    <symbol id="i-mail" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 6L2 7"/></symbol>
+    <!-- phone -->
+    <symbol id="i-phone" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></symbol>
+    <!-- badge/id-card -->
+    <symbol id="i-badge" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M8 11h3M8 15h5"/><circle cx="16" cy="12" r="2"/></symbol>
+    <!-- camera -->
+    <symbol id="i-camera" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></symbol>
+    <!-- user -->
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M3 21v-2a6 6 0 0 1 6-6h6a6 6 0 0 1 6 6v2"/></symbol>
+    <!-- settings -->
+    <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+    <!-- copy -->
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+    <!-- trash -->
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></symbol>
+    <!-- plus -->
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <!-- plus-circle -->
+    <symbol id="i-plus-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></symbol>
+    <!-- upload -->
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></symbol>
+    <!-- drag -->
+    <symbol id="i-drag" viewBox="0 0 24 24"><circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/></symbol>
+    <!-- check-circle -->
+    <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></symbol>
+    <!-- trophy -->
+    <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4zM17 7h3a2 2 0 0 1 0 4h-3M7 7H4a2 2 0 0 0 0 4h3"/></symbol>
+    <!-- savings/coin -->
+    <symbol id="i-coin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M9 9h4.5a2.5 2.5 0 0 1 0 5H9m0 0h4.5a2.5 2.5 0 0 0 0-5"/></symbol>
+    <!-- bell/notification -->
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></symbol>
+    <!-- form -->
+    <symbol id="i-form" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M8 13h8M8 17h5"/></symbol>
+    <!-- credit-card -->
+    <symbol id="i-card" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></symbol>
+    <!-- external-link -->
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></symbol>
+    <!-- clock -->
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+    <!-- hourglass -->
+    <symbol id="i-hourglass" viewBox="0 0 24 24"><path d="M6 2h12M6 22h12M17 22v-4.5a5.5 5.5 0 0 0-10 0V22M17 2v4.5a5.5 5.5 0 0 1-10 0V2"/></symbol>
+  </defs>
+</svg>
 
 <div class="header">
   <div class="header-left">
-    <div class="header-logo">承興</div>
-    <h1>承興 vs iEvents 架構對照<span class="sub">Backend Scope Analysis · 2026/02/23 報價單為準</span></h1>
+    <button class="mobile-nav-toggle" id="mobile-nav-toggle" aria-label="Toggle menu">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+    <div class="header-logo">iE</div>
+    <h1>iEvents 切版規格文件<span class="sub">承興展覽專案 · 後台基礎評估</span></h1>
+  </div>
+  <div class="header-right">
+    <span class="header-meta">v0.1 · 2026-04-17</span>
+    <div class="theme-switcher" id="theme-switcher">
+      <button class="theme-btn" data-theme="theme-s01">S01 科技極簡</button>
+      <button class="theme-btn" data-theme="theme-s03">S03 瑞士標準</button>
+      <button class="theme-btn active" data-theme="theme-s03-plus">S03+ 瑞士加強</button>
+      <button class="theme-btn" data-theme="theme-s09">S09 企業簡潔</button>
+    </div>
   </div>
 </div>
 
-<div class="summary-bar">
-  <div class="stats">
-    <div class="stat"><span class="stat-num" id="stat-total">0</span><span class="stat-label">總功能項</span></div>
-    <div class="stat"><span class="stat-num ok" id="stat-ok">0</span><span class="stat-label">可用</span></div>
-    <div class="stat"><span class="stat-num partial" id="stat-partial">0</span><span class="stat-label">部分可用</span></div>
-    <div class="stat"><span class="stat-num new" id="stat-new">0</span><span class="stat-label">需新做</span></div>
-    <div class="stat"><span class="stat-num hide" id="stat-hide">0</span><span class="stat-label">隱藏</span></div>
-    <div class="stat" style="margin-left:auto"><span class="stat-label">報價總額：</span><span class="stat-num" style="font-size:16px">$359,999.85 含稅</span></div>
+<div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+<div class="layout">
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-title">iEvents 9 大模組</div>
+
+  <div class="nav-group">
+    <div class="nav-group-title">已完成</div>
+    <a class="nav-item active" href="#m-activity">
+      <svg class="icon"><use href="#i-calendar"/></svg>
+      <span class="nav-label">1. 活動管理</span>
+      <span class="badge">6 頁</span>
+    </a>
   </div>
-</div>
 
-<div class="filter-bar">
-  <button class="filter-btn active" data-filter="all">全部 <span class="count" id="count-all">0</span></button>
-  <button class="filter-btn" data-filter="ok">可用 <span class="count" id="count-ok">0</span></button>
-  <button class="filter-btn" data-filter="partial">部分可用 <span class="count" id="count-partial">0</span></button>
-  <button class="filter-btn" data-filter="new">需新做 <span class="count" id="count-new">0</span></button>
-  <button class="filter-btn" data-filter="hide">隱藏 <span class="count" id="count-hide">0</span></button>
-</div>
+  <div class="nav-group">
+    <div class="nav-group-title">製作中</div>
+    <a class="nav-item pending" href="#">
+      <svg class="icon"><use href="#i-clipboard"/></svg>
+      <span class="nav-label">2. 名單管理</span>
+      <span class="badge">4 頁</span>
+    </a>
+    <a class="nav-item pending" href="#">
+      <svg class="icon"><use href="#i-form"/></svg>
+      <span class="nav-label">3. 表單管理</span>
+      <span class="badge">3 頁</span>
+    </a>
+    <a class="nav-item pending" href="#">
+      <svg class="icon"><use href="#i-users"/></svg>
+      <span class="nav-label">4. 來賓專屬頁</span>
+      <span class="badge">2 頁</span>
+    </a>
+    <a class="nav-item pending" href="#">
+      <svg class="icon"><use href="#i-mail"/></svg>
+      <span class="nav-label">5. Email 管理</span>
+      <span class="badge">4 頁</span>
+    </a>
+    <a class="nav-item pending" href="#">
+      <svg class="icon"><use href="#i-phone"/></svg>
+      <span class="nav-label">6. SMS 管理</span>
+      <span class="badge">2 頁</span>
+    </a>
+    <a class="nav-item pending" href="#">
+      <svg class="icon"><use href="#i-badge"/></svg>
+      <span class="nav-label">7. 識別證管理</span>
+      <span class="badge">2 頁</span>
+    </a>
+    <a class="nav-item pending" href="#">
+      <svg class="icon"><use href="#i-camera"/></svg>
+      <span class="nav-label">8. 現場執行</span>
+      <span class="badge">8 頁</span>
+    </a>
+    <a class="nav-item pending" href="#">
+      <svg class="icon"><use href="#i-user"/></svg>
+      <span class="nav-label">9. 會員帳戶</span>
+      <span class="badge">7 頁</span>
+    </a>
+  </div>
+</aside>
 
-<div class="canvas" id="canvas"></div>
+<main class="main" id="m-activity">
 
-<div class="footer">
-  <p>承興 vs iEvents 架構對照 · 依 2026-02-23 報價單（$359,999.85 含稅）整理</p>
-  <p>綠＝iEvents 有切版可直接用 · 黃＝有切版但需程式補細節 · 紅＝iEvents 無需新做 · 灰＝iEvents 有但承興不需要建議隱藏</p>
+  <div class="module-header">
+    <div class="module-eyebrow">模組 1 / 9</div>
+    <h1 class="module-title">活動管理</h1>
+    <p class="module-desc">iEvents 活動管理模組涵蓋建立一個活動的所有設定步驟，包含 6 個子頁面。使用者從活動首頁進入某個活動後，透過側邊選單切換本模組的 6 個子頁面。</p>
+    <div class="module-meta">
+      <span class="meta-item">子頁面：<strong>6</strong></span>
+      <span class="meta-item">麵包屑：<strong>iEvents → 活動管理</strong></span>
+      <span class="meta-item"><svg class="icon"><use href="#i-check"/></svg>核心模組</span>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-tab="t-setting">
+      <svg class="icon"><use href="#i-settings"/></svg>
+      活動設定 <span class="tab-num">3.1</span>
+    </button>
+    <button class="tab" data-tab="t-session">
+      <svg class="icon"><use href="#i-calendar"/></svg>
+      場次 <span class="tab-num">3.2</span>
+    </button>
+    <button class="tab" data-tab="t-ticket">
+      <svg class="icon"><use href="#i-trophy"/></svg>
+      票券種類 <span class="tab-num">3.3</span>
+    </button>
+    <button class="tab" data-tab="t-signup">
+      <svg class="icon"><use href="#i-form"/></svg>
+      報名表單 <span class="tab-num">3.4</span>
+    </button>
+    <button class="tab" data-tab="t-payment">
+      <svg class="icon"><use href="#i-card"/></svg>
+      金流 <span class="tab-num">3.5</span>
+    </button>
+    <button class="tab" data-tab="t-notification">
+      <svg class="icon"><use href="#i-bell"/></svg>
+      通知 <span class="tab-num">3.6</span>
+    </button>
+  </div>
+
+  <!-- ========== 3.1 活動設定 ========== -->
+  <section class="panel active" id="t-setting">
+    <div class="panel-head">
+      <span class="panel-eyebrow">子頁面 3.1</span>
+      <h2 class="panel-title">活動設定</h2>
+      <a class="panel-url" href="https://ievents.iware.com.tw/html/eventSetting.php" target="_blank" rel="noopener">https://ievents.iware.com.tw/html/eventSetting.php <svg class="icon" style="width:12px;height:12px"><use href="#i-link"/></svg></a>
+      <p class="panel-desc">設定活動最上層的基本資訊、時間、圖片、語系、描述。頁面為單一頁籤結構，包含 6 個區塊，由上而下呈現。</p>
+    </div>
+
+    <div class="section">
+      <h3>頁面區塊（6 個）</h3>
+      <div class="layout-a">
+        <div class="screenshot-wrap">
+          <img class="screenshot" src="screenshots/eventSetting.png" alt="活動設定全頁截圖" data-caption="活動設定 — 全頁" style="object-position: top">
+          <span class="screenshot-caption">全頁（點擊放大）</span>
+        </div>
+        <div>
+          <ul class="clean">
+            <li><strong>基本資訊</strong>：名稱、主辦單位、時區、時間、地點</li>
+            <li><strong>圖片呈現方式</strong>：橫幅 / 包含式 二選一</li>
+            <li><strong>活動視覺資源</strong>：活動主視覺 + 票券主視覺上傳</li>
+            <li><strong>語言設定</strong>：啟用語系（多選）+ 預設語系（單選）</li>
+            <li><strong>活動描述與報名</strong>：活動敘述（富文本）+ 開啟報名開關 + 來賓 ID 前綴字</li>
+            <li><strong>危險區域</strong>：刪除活動</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>表單欄位</h3>
+      <div class="layout-a">
+        <div class="screenshot-wrap">
+          <img class="screenshot" src="screenshots/eventSetting.png" alt="活動設定表單欄位" data-caption="活動設定 — 表單欄位區">
+          <span class="screenshot-caption">表單區（點擊放大）</span>
+        </div>
+        <div>
+          <table class="spec-table">
+            <thead><tr><th>欄位</th><th>型態</th><th style="width:80px">必填</th><th>預設值 / 說明</th></tr></thead>
+            <tbody>
+              <tr><td>活動名稱</td><td>字串</td><td class="required">✓</td><td>—</td></tr>
+              <tr><td>主辦單位</td><td>字串</td><td class="required">✓</td><td>—</td></tr>
+              <tr><td>選擇活動時區</td><td>下拉</td><td class="required">✓</td><td>45+ 時區（含 Taipei、Tokyo、Seoul、London…）</td></tr>
+              <tr><td>活動開始時間</td><td>日期時間</td><td class="required">✓</td><td>—</td></tr>
+              <tr><td>活動結束時間</td><td>日期時間</td><td class="required">✓</td><td>—</td></tr>
+              <tr><td>活動地點</td><td>字串</td><td>—</td><td>選填</td></tr>
+              <tr><td>圖片呈現方式</td><td>Radio</td><td class="required">✓</td><td>「畫面最上方橫幅廣告」/「圖中包含活動相關資訊」</td></tr>
+              <tr><td>活動主視覺</td><td>檔案上傳</td><td>—</td><td>含上傳 + 刪除</td></tr>
+              <tr><td>票券主視覺</td><td>檔案上傳</td><td>—</td><td>含上傳 + 刪除</td></tr>
+              <tr><td>啟用語系</td><td>Checkbox 多選</td><td>—</td><td>繁體中文 / 英文</td></tr>
+              <tr><td>預設語系</td><td>下拉</td><td class="required">✓</td><td>繁體中文 / 英文</td></tr>
+              <tr><td>活動敘述</td><td>富文本編輯器</td><td>—</td><td>支援圖文</td></tr>
+              <tr><td>開啟報名功能</td><td>Checkbox</td><td>—</td><td>開關</td></tr>
+              <tr><td>來賓 ID 前綴字</td><td>字串</td><td>—</td><td>附提示</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>按鈕</h3>
+      <div class="layout-a">
+        <div class="screenshot-wrap">
+          <img class="screenshot" src="screenshots/eventSetting.png" alt="活動設定按鈕區" data-caption="活動設定 — 儲存 + 刪除活動按鈕" style="object-position: bottom">
+          <span class="screenshot-caption">按鈕區（點擊放大）</span>
+        </div>
+        <div>
+          <table class="spec-table">
+            <thead><tr><th>按鈕</th><th>位置</th><th>行為</th></tr></thead>
+            <tbody>
+              <tr><td>儲存</td><td>頁面下方</td><td>保存所有更動</td></tr>
+              <tr><td><svg class="icon"><use href="#i-trash"/></svg> 刪除活動</td><td>危險區域</td><td>開啟刪除確認彈窗</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>彈窗：刪除活動確認</h3>
+      <div class="layout-a">
+        <div class="ph-img"><span class="ph-icon"><svg class="icon icon-xl"><use href="#i-trash"/></svg></span>刪除彈窗需點擊才會出現<br/><span style="font-size:10px;opacity:0.7">（待補）</span></div>
+        <div>
+          <div class="callout danger">
+            <strong>標題：</strong>刪除活動將會把活動的所有資料刪除，此動作無法復原<br>
+            <strong>內容：</strong>要求使用者<strong>輸入活動名稱</strong>作為確認<br>
+            <strong>按鈕：</strong>確認刪除
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>備註</h3>
+      <ul class="clean">
+        <li>時區下拉選單非常多（45+ 個，從 GMT-12 到 GMT+13）</li>
+        <li>活動圖片尺寸未明確建議，需與設計討論</li>
+        <li>富文本編輯器具體工具列（B/I/U/連結/圖片）未展開</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ========== 3.2 場次 ========== -->
+  <section class="panel" id="t-session">
+    <div class="panel-head">
+      <span class="panel-eyebrow">子頁面 3.2</span>
+      <h2 class="panel-title">場次</h2>
+      <a class="panel-url" href="https://ievents.iware.com.tw/html/eventSession.php" target="_blank" rel="noopener">https://ievents.iware.com.tw/html/eventSession.php <svg class="icon" style="width:12px;height:12px"><use href="#i-link"/></svg></a>
+      <p class="panel-desc">管理活動的多場次（如議程、分時段、不同入口）。場次與票種多對多關聯，支援 3 種報到種類。</p>
+    </div>
+
+    <div class="callout warn">
+      <strong>規則：</strong>場次建立後不得更改種類；至少保留 1 個場次與票種關聯否則來賓無法報到；免費票不可關聯付費場次。
+    </div>
+
+    <div class="section">
+      <h3>報到種類（3 種）</h3>
+      <div class="layout-a">
+        <div class="ph-img"><span class="ph-icon"><svg class="icon icon-xl"><use href="#i-check"/></svg></span>報到種類選擇截圖</div>
+        <div>
+          <table class="spec-table">
+            <thead><tr><th>類型</th><th>圖示</th><th>說明</th></tr></thead>
+            <tbody>
+              <tr><td><span class="chip success"><svg class="icon"><use href="#i-users"/></svg>一般入場</span></td><td>group</td><td>適合大多數場次，來賓報到入場</td></tr>
+              <tr><td><span class="chip"><svg class="icon"><use href="#i-check"/></svg>議程模式</span></td><td>fact_check</td><td>需確切記錄進場/離場（先簽到才能簽退）</td></tr>
+              <tr><td><span class="chip warn"><svg class="icon"><use href="#i-clock"/></svg>門禁模式</span></td><td>calendar_clock</td><td>不按順序、可重複簽到簽退、每次記錄為最後時間</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>場次列表欄位</h3>
+      <div class="layout-a">
+        <div class="ph-img"><span class="ph-icon"><svg class="icon icon-xl"><use href="#i-list"/></svg></span>場次列表截圖</div>
+        <div>
+          <table class="spec-table">
+            <thead><tr><th>欄位</th><th>型態</th><th>備註</th></tr></thead>
+            <tbody>
+              <tr><td>場次名稱</td><td>字串</td><td>—</td></tr>
+              <tr><td>報到種類</td><td>下拉</td><td>一般入場 / 議程 / 門禁</td></tr>
+              <tr><td>地點</td><td>字串</td><td>選填</td></tr>
+              <tr><td>開始時間</td><td>日期時間</td><td>格式 YYYY/MM/DD HH:MM AM/PM</td></tr>
+              <tr><td>結束時間</td><td>日期時間</td><td>同上</td></tr>
+              <tr><td>操作</td><td>按鈕組</td><td>設定 / 複製 / 刪除</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>新增 / 編輯場次表單</h3>
+      <div class="layout-a">
+        <div class="ph-img"><span class="ph-icon"><svg class="icon icon-xl"><use href="#i-form"/></svg></span>場次表單截圖</div>
+        <div>
+          <table class="spec-table">
+            <thead><tr><th>欄位</th><th>型態</th><th style="width:80px">必填</th><th>備註</th></tr></thead>
+            <tbody>
+              <tr><td>報到種類</td><td>Radio</td><td class="required">✓</td><td>一般 / 議程 / 門禁</td></tr>
+              <tr><td>場次名稱</td><td>字串</td><td class="required">✓</td><td>—</td></tr>
+              <tr><td>檢查人數限制</td><td>切換開關</td><td>—</td><td>—</td></tr>
+              <tr><td>地點</td><td>字串</td><td>—</td><td>—</td></tr>
+              <tr><td>開始時間</td><td>日期時間</td><td class="required">✓</td><td>—</td></tr>
+              <tr><td>結束時間</td><td>日期時間</td><td class="required">✓</td><td>—</td></tr>
+              <tr><td>價格</td><td>數字</td><td>—</td><td>關聯免費票則需為 0</td></tr>
+              <tr><td>人數上限</td><td>數字</td><td>—</td><td>—</td></tr>
+              <tr><td>場次說明</td><td>文字區</td><td>—</td><td>—</td></tr>
+              <tr><td>活動執行</td><td>連結</td><td>—</td><td>導向現場執行頁</td></tr>
+              <tr><td>列印識別證</td><td>連結</td><td>—</td><td>導向列印頁</td></tr>
+              <tr><td>關聯的票種</td><td>多選（僅編輯）</td><td>—</td><td>匯入票 / 現場報名 等</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>按鈕</h3>
+      <div class="layout-a">
+        <div class="ph-img"><span class="ph-icon"><svg class="icon icon-xl"><use href="#i-settings"/></svg></span>按鈕區截圖</div>
+        <div>
+          <table class="spec-table">
+            <thead><tr><th>按鈕</th><th>圖示</th><th>行為</th></tr></thead>
+            <tbody>
+              <tr><td><svg class="icon"><use href="#i-plus"/></svg> 新增場次</td><td>add</td><td>開啟新增表單</td></tr>
+              <tr><td><svg class="icon"><use href="#i-settings"/></svg> 設定</td><td>settings</td><td>編輯此場次</td></tr>
+              <tr><td><svg class="icon"><use href="#i-copy"/></svg> 複製</td><td>content_copy</td><td>複製場次</td></tr>
+              <tr><td><svg class="icon"><use href="#i-trash"/></svg> 刪除</td><td>delete</td><td>刪除確認彈窗</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>彈窗：刪除場次</h3>
+      <div class="layout-a">
+        <div class="ph-img"><span class="ph-icon"><svg class="icon icon-xl"><use href="#i-trash"/></svg></span>刪除彈窗截圖</div>
+        <div>
+          <div class="callout danger">
+            <strong>標題：</strong>你確定要刪除此場次？<br>
+            <strong>警告：</strong>刪除後，和此場次關聯的票種將同時移除關聯，這個動作無法復原<br>
+            <strong>按鈕：</strong>確認刪除 / 取消
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>場次列表欄位</h3>
+      <table class="spec-table">
+        <thead><tr><th>欄位</th><th>型態</th><th>備註</th></tr></thead>
+        <tbody>
+          <tr><td>場次名稱</td><td>字串</td><td>—</td></tr>
+          <tr><td>報到種類</td><td>下拉</td><td>一般入場 / 議程 / 門禁</td></tr>
+          <tr><td>地點</td><td>字串</td><td>選填</td></tr>
+          <tr><td>開始時間</td><td>日期時間</td><td>格式 YYYY/MM/DD HH:MM AM/PM</td></tr>
+          <tr><td>結束時間</td><td>日期時間</td><td>同上</td></tr>
+          <tr><td>操作</td><td>按鈕組</td><td>設定 / 複製 / 刪除</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <h3>新增 / 編輯場次表單</h3>
+      <table class="spec-table">
+        <thead><tr><th>欄位</th><th>型態</th><th style="width:80px">必填</th><th>備註</th></tr></thead>
+        <tbody>
+          <tr><td>報到種類</td><td>Radio</td><td class="required">✓</td><td>一般 / 議程 / 門禁</td></tr>
+          <tr><td>場次名稱</td><td>字串</td><td class="required">✓</td><td>—</td></tr>
+          <tr><td>檢查人數限制</td><td>切換開關</td><td>—</td><td>—</td></tr>
+          <tr><td>地點</td><td>字串</td><td>—</td><td>—</td></tr>
+          <tr><td>開始時間</td><td>日期時間</td><td class="required">✓</td><td>—</td></tr>
+          <tr><td>結束時間</td><td>日期時間</td><td class="required">✓</td><td>—</td></tr>
+          <tr><td>價格</td><td>數字</td><td>—</td><td>關聯免費票則需為 0</td></tr>
+          <tr><td>人數上限</td><td>數字</td><td>—</td><td>—</td></tr>
+          <tr><td>場次說明</td><td>文字區</td><td>—</td><td>—</td></tr>
+          <tr><td>活動執行</td><td>連結</td><td>—</td><td>導向現場執行頁</td></tr>
+          <tr><td>列印識別證</td><td>連結</td><td>—</td><td>導向列印頁</td></tr>
+          <tr><td>關聯的票種</td><td>多選（僅編輯）</td><td>—</td><td>匯入票 / 現場報名 等</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <h3>按鈕</h3>
+      <table class="spec-table">
+        <thead><tr><th>按鈕</th><th>圖示</th><th>行為</th></tr></thead>
+        <tbody>
+          <tr><td><svg class="icon"><use href="#i-plus"/></svg> 新增場次</td><td>add</td><td>開啟新增表單</td></tr>
+          <tr><td><svg class="icon"><use href="#i-settings"/></svg> 設定</td><td>settings</td><td>編輯此場次</td></tr>
+          <tr><td><svg class="icon"><use href="#i-copy"/></svg> 複製</td><td>content_copy</td><td>複製場次</td></tr>
+          <tr><td><svg class="icon"><use href="#i-trash"/></svg> 刪除</td><td>delete</td><td>刪除確認彈窗</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <h3>彈窗：刪除場次</h3>
+      <div class="callout danger">
+        <strong>標題：</strong>你確定要刪除此場次？<br>
+        <strong>警告：</strong>刪除後，和此場次關聯的票種將同時移除關聯，這個動作無法復原<br>
+        <strong>按鈕：</strong>確認刪除 / 取消
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 3.3 票券種類 ========== -->
+  <section class="panel" id="t-ticket">
+    <div class="panel-head">
+      <span class="panel-eyebrow">子頁面 3.3</span>
+      <h2 class="panel-title">票券種類</h2>
+      <a class="panel-url" href="https://ievents.iware.com.tw/html/eventTicketType.php" target="_blank" rel="noopener">https://ievents.iware.com.tw/html/eventTicketType.php <svg class="icon" style="width:12px;height:12px"><use href="#i-link"/></svg></a>
+      <p class="panel-desc">管理活動的票種（免費 / 付費 / 匯入），每個票種可關聯場次。支援價格、庫存、售票時間、審核方式等。</p>
+    </div>
+
+    <div class="section">
+      <h3>票券類型（3 種）</h3>
+      <div class="layout-a">
+        <div class="ph-img"><span class="ph-icon"><svg class="icon icon-xl"><use href="#i-trophy"/></svg></span>票券類型選擇截圖</div>
+        <div>
+          <table class="spec-table">
+            <thead><tr><th>類型</th><th>特性</th><th>主要欄位</th></tr></thead>
+            <tbody>
+              <tr><td><span class="chip"><svg class="icon"><use href="#i-upload"/></svg>匯入票（預設）</span></td><td>系統預設，僅透過平台匯入或後台新增</td><td>名稱、數量、關聯場次</td></tr>
+              <tr><td><span class="chip success"><svg class="icon"><use href="#i-trophy"/></svg>報名票（免費）</span></td><td>來賓可自行報名選擇</td><td>名稱、數量、關聯場次、審核方式</td></tr>
+              <tr><td><span class="chip warn"><svg class="icon"><use href="#i-coin"/></svg>報名票（付費）</span></td><td>需金流支付</td><td>名稱、價格、數量、售票時間、計價方式</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>票券表單欄位</h3>
+      <div class="layout-a">
+        <div class="ph-img"><span class="ph-icon"><svg class="icon icon-xl"><use href="#i-form"/></svg></span>票券表單截圖</div>
+        <div>
+          <table class="spec-table">
+            <thead><tr><th>欄位</th><th>型態</th><th style="width:80px">必填</th><th>備註</th></tr></thead>
+            <tbody>
+              <tr><td>票券名稱</td><td>字串</td><td class="required">✓</td><td>—</td></tr>
+              <tr><td>價格</td><td>數字</td><td>付費必填</td><td>—</td></tr>
+              <tr><td>數量</td><td>數字</td><td class="required">✓</td><td>庫存總數</td></tr>
+              <tr><td>售票開始時間</td><td>日期時間</td><td>報名票</td><td>—</td></tr>
+              <tr><td>售票結束時間</td><td>日期時間</td><td>報名票</td><td>—</td></tr>
+              <tr><td>報名審核方式</td><td>Radio</td><td>—</td><td>人工審核 / 自動核准</td></tr>
+              <tr><td>場次關聯方式</td><td>Radio</td><td>—</td><td>後台指定 / 來賓自選</td></tr>
+              <tr><td>場次關聯是否覆蓋</td><td>Radio</td><td>—</td><td>是 / 否</td></tr>
+              <tr><td>最少選擇數量</td><td>數字</td><td>—</td><td>0 = 不限</td></tr>
+              <tr><td>最多選擇數量</td><td>數字</td><td>—</td><td>0 = 不限</td></tr>
+              <tr><td>來賓必去場次</td><td>多選</td><td>—</td><td>免費票不可選付費場次</td></tr>
+              <tr><td>來賓可選場次</td><td>多選</td><td>—</td><td>免費票不可選付費場次</td></tr>
+              <tr><td>票券說明</td><td>文字區</td><td>—</td><td>—</td></tr>
+              <tr><td>計價方式</td><td>Radio</td><td>—</td><td>依票種計費 / 依場次計費</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>列表顯示欄位</h3>
+      <div class="layout-a">
+        <div class="ph-img"><span class="ph-icon"><svg class="icon icon-xl"><use href="#i-list"/></svg></span>票券列表截圖</div>
+        <div>
+          <ul class="clean">
+            <li>票券名稱、類型、價格</li>
+            <li><strong>尚餘數 / 庫存數</strong>（如 30/30）</li>
+            <li><strong>銷售統計</strong>（9 類）：出售、待審核、待付款、有效、已付款、核准、拒絕、逾期付款、異常</li>
+            <li>售票狀態：未販售 / 售票中 / 已停售</li>
+          </ul>
+          <div class="callout info">列表頂部標示「<strong>非即時更新</strong>」</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>按鈕</h3>
+      <div class="layout-a">
+        <div class="ph-img"><span class="ph-icon"><svg class="icon icon-xl"><use href="#i-plus"/></svg></span>按鈕區截圖</div>
+        <div>
+          <table class="spec-table">
+            <thead><tr><th>按鈕</th><th>圖示</th><th>行為</th></tr></thead>
+            <tbody>
+              <tr><td><svg class="icon"><use href="#i-trophy"/></svg> 新增免費票</td><td>award_star</td><td>開啟免費票表單</td></tr>
+              <tr><td><svg class="icon"><use href="#i-coin"/></svg> 新增付費票</td><td>savings</td><td>開啟付費票表單</td></tr>
+              <tr><td><svg class="icon"><use href="#i-settings"/></svg> 設定</td><td>settings</td><td>編輯票券</td></tr>
+              <tr><td><svg class="icon"><use href="#i-copy"/></svg> 複製</td><td>content_copy</td><td>複製票券</td></tr>
+              <tr><td><svg class="icon"><use href="#i-trash"/></svg> 刪除</td><td>delete</td><td>二次確認後刪除</td></tr>
+              <tr><td>開始販售</td><td>—</td><td>狀態改「售票中」</td></tr>
+              <tr><td>暫停販售</td><td>—</td><td>狀態改「已停售」</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>規則與限制</h3>
+      <div class="callout warn">
+        <strong>匯入票</strong>是系統預設，匯入名單或新增單筆時來賓皆被設為匯入票。<br>
+        <strong>匯入票 + 報名票</strong>不得超過帳號方案的來賓人數上限（如 1000 人）。<br>
+        每個票種至少關聯 1 個場次，否則來賓無法報到。<br>
+        免費票不可關聯付費場次。
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 3.4 報名表單 ========== -->
+  <section class="panel" id="t-signup">
+    <div class="panel-head">
+      <span class="panel-eyebrow">子頁面 3.4</span>
+      <h2 class="panel-title">報名表單</h2>
+      <a class="panel-url" href="https://ievents.iware.com.tw/html/eventSignUp.php" target="_blank" rel="noopener">https://ievents.iware.com.tw/html/eventSignUp.php <svg class="icon" style="width:12px;height:12px"><use href="#i-link"/></svg></a>
+      <p class="panel-desc">自訂此活動的報名表單欄位。系統預設 2 個不可刪除欄位，可新增 3 種自訂欄位型態。支援拖拽排序。</p>
+    </div>
+
+    <div class="section">
+      <h3>系統預設欄位（不可刪除）</h3>
+      <div class="layout-a">
+        <div class="ph-img"><span class="ph-icon"><svg class="icon icon-xl"><use href="#i-form"/></svg></span>預設欄位截圖</div>
+        <div>
+          <table class="spec-table">
+            <thead><tr><th>欄位</th><th>型態</th><th>備註</th></tr></thead>
+            <tbody>
+              <tr><td>名稱</td><td>字串</td><td><span class="chip danger">不可刪除</span></td></tr>
+              <tr><td>信箱</td><td>Email</td><td><span class="chip danger">不可刪除</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>可新增的自訂欄位類型（切版僅見 3 種）</h3>
+      <div class="layout-a">
+        <div class="ph-img"><span class="ph-icon"><svg class="icon icon-xl"><use href="#i-plus-circle"/></svg></span>新增欄位按鈕截圖</div>
+        <div>
+          <table class="spec-table">
+            <thead><tr><th>型態</th><th>圖示</th><th>備註</th></tr></thead>
+            <tbody>
+              <tr><td><svg class="icon"><use href="#i-plus-circle"/></svg> 文字欄</td><td>add_circle</td><td>一般單行文字</td></tr>
+              <tr><td><svg class="icon"><use href="#i-plus-circle"/></svg> 單選題</td><td>add_circle</td><td>Radio 類型</td></tr>
+              <tr><td><svg class="icon"><use href="#i-plus-circle"/></svg> 多選題</td><td>add_circle</td><td>Checkbox 類型</td></tr>
+            </tbody>
+          </table>
+          <div class="callout warn">
+            <strong>注意：</strong>切版僅見 3 種。若承興需要完整 13 種（字串/數字/Email/網址/文字框/日期/日期時間/下拉/單選/多選/國家/縣市/地址）<strong>需程式擴充</strong>。
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>每個自訂欄位的設定選項</h3>
+      <ul class="clean">
+        <li><strong>欄位型態標籤</strong>：例如「[單行文字]」</li>
+        <li><strong>必填</strong>：Checkbox</li>
+        <li><strong>拖拽排序</strong>：drag_indicator 圖示</li>
+        <li><strong>刪除</strong>：delete 圖示</li>
+        <li><strong>選項內容</strong>：單選 / 多選時用，輸入方式：<strong>Enter 或逗號（,）</strong></li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h3>按鈕</h3>
+      <div class="layout-a">
+        <div class="ph-img"><span class="ph-icon"><svg class="icon icon-xl"><use href="#i-settings"/></svg></span>操作按鈕截圖</div>
+        <div>
+          <table class="spec-table">
+            <thead><tr><th>按鈕</th><th>位置</th><th>行為</th></tr></thead>
+            <tbody>
+              <tr><td><svg class="icon"><use href="#i-plus-circle"/></svg> 新增 文字欄</td><td>自訂區上方</td><td>加一個文字欄</td></tr>
+              <tr><td><svg class="icon"><use href="#i-plus-circle"/></svg> 新增 單選題</td><td>自訂區上方</td><td>加一個單選</td></tr>
+              <tr><td><svg class="icon"><use href="#i-plus-circle"/></svg> 新增 多選題</td><td>自訂區上方</td><td>加一個多選</td></tr>
+              <tr><td><svg class="icon"><use href="#i-drag"/></svg> 拖拽</td><td>每欄位上</td><td>調整順序</td></tr>
+              <tr><td><svg class="icon"><use href="#i-trash"/></svg> 刪除欄位</td><td>每欄位上</td><td>刪除此欄位</td></tr>
+              <tr><td>儲存</td><td>頁面底部</td><td>保存所有欄位設定</td></tr>
+              <tr><td><svg class="icon"><use href="#i-link"/></svg> 前往連結</td><td>連結區</td><td>開啟報名頁</td></tr>
+              <tr><td><svg class="icon"><use href="#i-copy"/></svg> 複製連結</td><td>連結區</td><td>複製 URL</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>圖片上傳（報名表單圖）</h3>
+      <div class="layout-a">
+        <div class="ph-img"><span class="ph-icon"><svg class="icon icon-xl"><use href="#i-upload"/></svg></span>圖片上傳介面截圖</div>
+        <div>
+          <ul class="clean">
+            <li><strong>上傳按鈕</strong>：cloud_upload「請選擇圖片」</li>
+            <li><strong>刪除按鈕</strong>：delete「刪除檔案」</li>
+            <li>圖片在報名頁顯示於表單上方</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 3.5 金流 ========== -->
+  <section class="panel" id="t-payment">
+    <div class="panel-head">
+      <span class="panel-eyebrow">子頁面 3.5</span>
+      <h2 class="panel-title">金流</h2>
+      <a class="panel-url" href="https://ievents.iware.com.tw/html/eventPayment.php" target="_blank" rel="noopener">https://ievents.iware.com.tw/html/eventPayment.php <svg class="icon" style="width:12px;height:12px"><use href="#i-link"/></svg></a>
+      <p class="panel-desc">設定藍新金流串接參數。切版僅支援藍新，且只有 3 個核心欄位。</p>
+    </div>
+
+    <div class="section">
+      <h3>可用金流提供者</h3>
+      <div class="layout-a">
+        <div class="ph-img"><span class="ph-icon"><svg class="icon icon-xl"><use href="#i-card"/></svg></span>金流選擇截圖</div>
+        <div>
+          <p><span class="chip"><svg class="icon"><use href="#i-card"/></svg>藍新金流</span>（切版僅此一種）</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>設定欄位</h3>
+      <div class="layout-a">
+        <div class="ph-img"><span class="ph-icon"><svg class="icon icon-xl"><use href="#i-form"/></svg></span>金流設定截圖</div>
+        <div>
+          <table class="spec-table">
+            <thead><tr><th>欄位</th><th>型態</th><th>備註</th></tr></thead>
+            <tbody>
+              <tr><td>商家代號</td><td>字串</td><td>藍新後台提供</td></tr>
+              <tr><td>Hash Key</td><td>字串</td><td>藍新後台提供</td></tr>
+              <tr><td>Hash IV</td><td>字串</td><td>藍新後台提供</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout danger">
+      <strong>切版未見以下功能</strong>（若承興需要需程式補）：
+      <ul class="clean" style="margin-top:10px">
+        <li>測試 / 正式環境切換</li>
+        <li>付款方式選擇（信用卡、WebATM、ATM、超商代收、超商取貨等）</li>
+        <li>手續費設定、API URL 欄位</li>
+        <li>測試連線按鈕</li>
+        <li>分期付款設定</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ========== 3.6 通知 ========== -->
+  <section class="panel" id="t-notification">
+    <div class="panel-head">
+      <span class="panel-eyebrow">子頁面 3.6</span>
+      <h2 class="panel-title">通知</h2>
+      <a class="panel-url" href="https://ievents.iware.com.tw/html/eventNotification.php" target="_blank" rel="noopener">https://ievents.iware.com.tw/html/eventNotification.php <svg class="icon" style="width:12px;height:12px"><use href="#i-link"/></svg></a>
+      <p class="panel-desc">設定報名流程中 4 種通知信的開關與審核機制。本頁僅管開關，實際信件內容在 Email 管理模組編輯。</p>
+    </div>
+
+    <div class="section">
+      <h3>通知信類型（4 種）</h3>
+      <div class="layout-a">
+        <div class="ph-img"><span class="ph-icon"><svg class="icon icon-xl"><use href="#i-bell"/></svg></span>通知信開關截圖</div>
+        <div>
+          <table class="spec-table">
+            <thead><tr><th>通知</th><th>觸發時機</th><th>備註</th></tr></thead>
+            <tbody>
+              <tr><td><svg class="icon"><use href="#i-bell"/></svg> 報名成功通知信</td><td>報名成功</td><td>帶提示</td></tr>
+              <tr><td><svg class="icon"><use href="#i-check"/></svg> 審核通過通知信</td><td>審核通過（人工審核模式下）</td><td>帶提示</td></tr>
+              <tr><td><svg class="icon"><use href="#i-card"/></svg> 付款完成通知信</td><td>付款成功</td><td>帶提示</td></tr>
+              <tr><td>拒絕通知信</td><td>審核被拒</td><td>帶提示</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>審核機制（於票券種類設定中選擇）</h3>
+      <div class="layout-a">
+        <div class="ph-img"><span class="ph-icon"><svg class="icon icon-xl"><use href="#i-check"/></svg></span>審核機制選擇截圖</div>
+        <div>
+          <ul class="clean">
+            <li><span class="chip">人工審核</span>：管理員手動確認</li>
+            <li><span class="chip success">自動核准</span>：自動通過</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>關聯頁面（Email 管理模組）</h3>
+      <div class="layout-a">
+        <div class="ph-img"><span class="ph-icon"><svg class="icon icon-xl"><use href="#i-mail"/></svg></span>Email 管理區截圖</div>
+        <div>
+          <table class="spec-table">
+            <thead><tr><th>頁面</th><th>用途</th></tr></thead>
+            <tbody>
+              <tr><td><code>/html/eventEmail.php</code></td><td>Email 管理</td></tr>
+              <tr><td><code>/html/eventEmailTemp.php</code></td><td>信件範本</td></tr>
+              <tr><td><code>/html/eventEmailEdit.php</code></td><td>信件編輯器</td></tr>
+              <tr><td><code>/html/eventSms.php</code></td><td>SMS 管理（獨立區塊）</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
 </div>
 
 <script>
-// =====================================================
-// 資料定義：每個報價單項目 → 子功能 → iEvents 對應 + 備註
-// =====================================================
-const sections = [
-  {
-    title: "1. 後台首頁儀表板",
-    price: "$15,000",
-    items: [
-      {
-        name: "統計卡片",
-        sub: "本週新增：活動 / 會員 / 報名 / 訂單",
-        status: "partial",
-        ievents: "/html/index.php + /html/event.php",
-        note: "iEvents 首頁有系統公告區塊，統計卡片需程式補 4 類數字統計元件"
-      },
-      {
-        name: "最新活動列表",
-        sub: "近期活動 + 快速進入編輯",
-        status: "ok",
-        ievents: "/html/event.php",
-        note: "iEvents 活動首頁有列表，直接對應"
-      },
-      {
-        name: "活動月曆",
-        sub: "月曆視圖顯示各日期活動",
-        status: "new",
-        ievents: null,
-        note: "iEvents 無月曆元件，程式全新做（可用 FullCalendar 等套件）"
-      },
-      {
-        name: "新會員列表",
-        sub: "近期註冊會員 + 快速進入詳情",
-        status: "new",
-        ievents: null,
-        note: "iEvents 無會員列表模組，程式新做"
-      }
-    ]
-  },
-  {
-    title: "2. 活動系統管理",
-    price: "$30,000",
-    items: [
-      {
-        name: "活動新增 / 編輯 / 刪除",
-        status: "ok",
-        ievents: "/html/eventSetting.php",
-        note: "iEvents 活動設定完整對應，程式依介面套用即可"
-      },
-      {
-        name: "活動基本資訊",
-        sub: "名稱、日期、地點、圖片、報名須知",
-        status: "ok",
-        ievents: "/html/eventSetting.php",
-        note: "欄位對應完整"
-      },
-      {
-        name: "報名時間 / 人數限額",
-        status: "ok",
-        ievents: "/html/eventSetting.php",
-        note: "iEvents 有對應欄位"
-      },
-      {
-        name: "活動狀態",
-        sub: "草稿 / 上架 / 下架",
-        status: "partial",
-        ievents: "/html/eventSetting.php",
-        note: "[Q1] iEvents 只有「啟用 / 停用」開關，承興要 3 種狀態（草稿 / 上架 / 下架）。問題較小，程式新增一個狀態欄位即可"
-      },
-      {
-        name: "活動複製",
-        sub: "複製既有活動快速建立",
-        status: "new",
-        ievents: null,
-        note: "iEvents 切版未見複製按鈕，程式加按鈕 + 後端 clone 邏輯"
-      },
-      {
-        name: "活動列表篩選",
-        sub: "依分類 / 狀態",
-        status: "ok",
-        ievents: "/html/event.php",
-        note: "iEvents 活動首頁有篩選"
-      },
-      {
-        name: "自訂網址",
-        sub: "主網域 / 自訂名稱",
-        status: "ok",
-        ievents: "/html/eventSetting.php",
-        note: "iEvents 活動設定含自訂網址欄位"
-      },
-      {
-        name: "活動分類管理",
-        status: "new",
-        ievents: null,
-        note: "iEvents 無分類管理模組，程式全新做（CRUD + 排序 + 使用中無法刪除）"
-      },
-      {
-        name: "活動標籤管理",
-        status: "new",
-        ievents: null,
-        note: "iEvents 無標籤系統，程式全新做（一活動多標籤）"
-      },
-      {
-        name: "驗證設定",
-        sub: "會員 / Email / 手機",
-        status: "partial",
-        ievents: "/html/eventSetting.php + /html/eventNotification.php",
-        note: "iEvents 有審核機制，驗證方式的完整性程式依介面補"
-      },
-      {
-        name: "文案 4 區塊編輯器",
-        sub: "內容說明 / 注意事項 / 報名完成 / 同意條款",
-        status: "partial",
-        ievents: "/html/eventSetting.php",
-        note: "[Q2] iEvents 切版可能只有 1-2 個文案編輯器，程式依承興介面做到 4 個區塊"
-      },
-      {
-        name: "QR Code 設定",
-        sub: "啟用 + 共用碼 / 會員專屬碼",
-        status: "new",
-        ievents: "/html/eventCodeDl.php",
-        note: "[Q3] iEvents 有 QR Code 下載頁但類型切換功能未見，需額外開發 2 種類型邏輯"
-      },
-      {
-        name: "SEO 設定",
-        sub: "Meta Title / Keywords / Description",
-        status: "new",
-        ievents: null,
-        note: "iEvents 切版無 SEO 設定頁，程式全新做（3 個欄位）"
-      }
-    ]
-  },
-  {
-    title: "3. 報名系統管理",
-    price: "$30,000",
-    items: [
-      {
-        name: "動態報名欄位（預設 4 個）",
-        sub: "姓名、Email、手機、進場人數",
-        status: "partial",
-        ievents: "/html/eventSignUp.php",
-        note: "iEvents 預設只 2 個（姓名、信箱），差 2 個（手機、進場人數）請程式補上"
-      },
-      {
-        name: "自訂欄位型態（11-13 種）",
-        sub: "字串 / 數字 / Email / 網址 / 文字框 / 日期 / 日期時間 / 下拉 / 單選 / 多選 / 縣市 / 地址",
-        status: "partial",
-        ievents: "/html/eventSignUp.php",
-        note: "[Q4] iEvents 切版目前只看到 3 種（單行、單選、多選），請程式補其餘 8-10 種欄位型態"
-      },
-      {
-        name: "欄位拖拽排序",
-        status: "ok",
-        ievents: "/html/eventSignUp.php",
-        note: "iEvents 已有 drag_indicator 排序功能"
-      },
-      {
-        name: "必填設定",
-        status: "ok",
-        ievents: "/html/eventSignUp.php",
-        note: "iEvents 欄位可設必填"
-      },
-      {
-        name: "多場次管理",
-        sub: "時段 / 人數限額 / 額滿",
-        status: "ok",
-        ievents: "/html/eventSession.php",
-        note: "iEvents 場次管理完整"
-      },
-      {
-        name: "多場次報名規則",
-        sub: "不限 / 每天 N 次 / 展期 N 次",
-        status: "partial",
-        ievents: "/html/eventSession.php",
-        note: "[Q5] iEvents 場次規則彈性不確定，請程式依承興 3 種規則補實作"
-      },
-      {
-        name: "報名資料查詢 / 篩選 / 搜尋",
-        status: "ok",
-        ievents: "/html/eventRegister.php + /html/eventRegisterDetail.php",
-        note: "iEvents 名單管理對應完整"
-      },
-      {
-        name: "報名詳情 / 編輯 / 取消 / 取消核銷",
-        status: "ok",
-        ievents: "/html/eventRegisterDetail.php",
-        note: "iEvents 名單詳細頁可對應（原為彈窗）"
-      },
-      {
-        name: "報名狀態",
-        sub: "待核銷 / 已核銷 / 部分核銷 / 已取消",
-        status: "new",
-        ievents: null,
-        note: "[Q6] iEvents 原本沒有此狀態機制，核銷系統要額外製作狀態管理"
-      },
-      {
-        name: "報名資料匯出 CSV",
-        status: "new",
-        ievents: "/html/eventRegister.php",
-        note: "[Q7] iEvents 切版未明確提匯出按鈕，請程式製作 CSV 匯出功能（前端按鈕 + 後端產檔）"
-      },
-      {
-        name: "欄位設定彈窗",
-        status: "ok",
-        ievents: "/html/eventRegisterCol.php",
-        note: "iEvents 原為彈窗，可直接用"
-      }
-    ]
-  },
-  {
-    title: "4. QR Code 系統管理（含離線核銷 + 識別證）",
-    price: "$70,000",
-    items: [
-      {
-        name: "手機 / 平板核銷介面",
-        status: "ok",
-        ievents: "/html/checkinFlow.php",
-        note: "iEvents 報到掃描切版可用"
-      },
-      {
-        name: "活動執行登入",
-        status: "ok",
-        ievents: "/onsite/#/auth/login",
-        note: "iEvents 有獨立現場登入頁"
-      },
-      {
-        name: "活動執行 Dashboard",
-        status: "ok",
-        ievents: "/onsite/#/dashboard/home + /onsite/#/dashboard/execute",
-        note: "iEvents 現場工作台介面可用"
-      },
-      {
-        name: "掃描結果（綠 成功 / 紅 失敗 / 淺藍 人工）",
-        status: "ok",
-        ievents: "/html/checkinFlow.php",
-        note: "[Q8] UI 配色沒問題，依 iEvents 切版套用即可"
-      },
-      {
-        name: "掃描失敗原因顯示",
-        sub: "已報到 / 非本活動 / 報名不存在",
-        status: "partial",
-        ievents: "/html/checkinFlow.php",
-        note: "iEvents 有失敗介面，具體訊息內容程式依承興需求調整"
-      },
-      {
-        name: "手動輸入報名編號",
-        sub: "QR 無法掃時",
-        status: "partial",
-        ievents: "/html/checkinFlow.php",
-        note: "iEvents 切版有類似功能，程式依介面確認"
-      },
-      {
-        name: "人工確認介面",
-        sub: "淺藍色",
-        status: "new",
-        ievents: null,
-        note: "iEvents 切版未見獨立人工確認頁，程式新做或整合進現有核銷流程"
-      },
-      {
-        name: "核銷時間限制",
-        status: "new",
-        ievents: null,
-        note: "iEvents 無此邏輯，程式新做"
-      },
-      {
-        name: "進場次數（N 次 / M 次）",
-        sub: "展覽可設每張票進 2 次",
-        status: "new",
-        ievents: null,
-        note: "iEvents 無此邏輯，程式新做"
-      },
-      {
-        name: "連續掃描",
-        sub: "核銷後自動跳回",
-        status: "partial",
-        ievents: "/html/checkinFlow.php",
-        note: "iEvents 切版可能有，程式確認流程"
-      },
-      {
-        name: "報名查詢核銷",
-        sub: "姓名 / 手機 / Email",
-        status: "ok",
-        ievents: "/html/checkinLookup.php",
-        note: "iEvents 報到查詢對應完整"
-      },
-      {
-        name: "核銷設備管理",
-        sub: "多設備 + 入口 A/B/VIP",
-        status: "partial",
-        ievents: "/html/activeCode.php",
-        note: "[Q9] iEvents 有啟動碼概念類似但非完全等同，程式處理：擴充「設備綁定活動」功能（VIP 入口只核銷 VIP 場次）"
-      },
-      {
-        name: "設備核銷紀錄 / 統計",
-        status: "ok",
-        ievents: "/html/checkinStatistic.php",
-        note: "iEvents 有報到統計可用"
-      },
-      {
-        name: "後台核銷紀錄管理",
-        sub: "時間 / 設備 / 工作人員 / 取消核銷",
-        status: "partial",
-        ievents: "/html/checkinLookup.php + /html/checkinStatistic.php",
-        note: "iEvents 有查詢和統計，「取消核銷」功能程式補"
-      },
-      {
-        name: "★ 離線核銷 — PWA 運作",
-        status: "new",
-        ievents: null,
-        note: "★ 承興核心需求。iEvents 純線上無 PWA，程式全新做（Service Worker + Manifest）"
-      },
-      {
-        name: "★ 離線核銷 — 預先下載資料",
-        status: "new",
-        ievents: null,
-        note: "★ 程式全新做（IndexedDB 儲存報名資料）"
-      },
-      {
-        name: "★ 離線核銷 — 自動切換離線",
-        status: "new",
-        ievents: null,
-        note: "★ 程式全新做（navigator.onLine 偵測）"
-      },
-      {
-        name: "★ 離線核銷 — 暫存核銷紀錄",
-        status: "new",
-        ievents: null,
-        note: "★ 程式全新做（IndexedDB 佇列機制）"
-      },
-      {
-        name: "★ 離線核銷 — 網路恢復自動同步",
-        status: "new",
-        ievents: null,
-        note: "★ 程式全新做（Background Sync / 輪詢）"
-      },
-      {
-        name: "★ 狀態列",
-        sub: "網路 / 離線 / DB / 待上傳",
-        status: "new",
-        ievents: null,
-        note: "★ 程式新做底部狀態列元件"
-      },
-      {
-        name: "★ 手動清除離線資料庫",
-        status: "new",
-        ievents: null,
-        note: "★ 程式新做按鈕 + 邏輯"
-      },
-      {
-        name: "識別證版面 — 尺寸 + 背景圖",
-        sub: "預設 9x13cm",
-        status: "ok",
-        ievents: "/winnie/eventBadge.php",
-        note: "iEvents 識別證管理完整"
-      },
-      {
-        name: "識別證版面 — QR Code 位置",
-        status: "ok",
-        ievents: "/winnie/badgeEditor.php",
-        note: "iEvents 編輯器可拖拉定位"
-      },
-      {
-        name: "識別證版面 — 文字欄位",
-        sub: "位置 / 字型 / 大小 / 顏色",
-        status: "ok",
-        ievents: "/winnie/badgeEditor.php",
-        note: "iEvents 編輯器完整支援"
-      },
-      {
-        name: "識別證 — 變數帶入",
-        sub: "姓名 / 公司 / 職稱",
-        status: "ok",
-        ievents: "/winnie/badgeEditor.php",
-        note: "iEvents 用 ==欄位名稱== 語法，對應完整"
-      },
-      {
-        name: "識別證預覽",
-        status: "ok",
-        ievents: "/winnie/badgeEditor.php",
-        note: "iEvents 編輯器可預覽"
-      }
-    ]
-  },
-  {
-    title: "5. 追蹤碼管理（埋點）",
-    price: "$20,000",
-    items: [
-      {
-        name: "全域追蹤碼",
-        sub: "活動所有頁面生效",
-        status: "new",
-        ievents: null,
-        note: "iEvents 無追蹤碼設定頁，程式新做"
-      },
-      {
-        name: "活動介紹頁追蹤碼",
-        status: "new",
-        ievents: null,
-        note: "程式新做"
-      },
-      {
-        name: "報名頁追蹤碼",
-        status: "new",
-        ievents: null,
-        note: "程式新做"
-      },
-      {
-        name: "報名成功頁追蹤碼",
-        status: "new",
-        ievents: null,
-        note: "程式新做（報價不含部門 / 人員 / 媒體管理，只做 4 個埋點）"
-      }
-    ]
-  },
-  {
-    title: "6. 通知信件系統管理（6 類信件）",
-    price: "$15,000",
-    items: [
-      {
-        name: "會員註冊完成信",
-        status: "ok",
-        ievents: "/html/eventEmail.php + /html/eventEmailTemp.php + /html/eventEmailEdit.php",
-        note: "iEvents Email 系統完整可用，建立範本即可"
-      },
-      {
-        name: "會員忘記密碼信",
-        status: "ok",
-        ievents: "同上",
-        note: "建範本"
-      },
-      {
-        name: "會員密碼變更確認信",
-        status: "ok",
-        ievents: "同上",
-        note: "建範本"
-      },
-      {
-        name: "訂單通知（給會員）",
-        status: "ok",
-        ievents: "同上",
-        note: "建範本"
-      },
-      {
-        name: "訂單通知（給管理者）",
-        status: "ok",
-        ievents: "同上",
-        note: "建範本"
-      },
-      {
-        name: "訂單取消通知（給管理者）",
-        status: "ok",
-        ievents: "同上",
-        note: "建範本"
-      },
-      {
-        name: "後台編輯信件主旨",
-        status: "ok",
-        ievents: "/html/eventEmailEdit.php",
-        note: "iEvents 信件編輯器可用"
-      },
-      {
-        name: "後台編輯信件內容（富文本）",
-        status: "ok",
-        ievents: "/html/eventEmailEdit.php",
-        note: "iEvents 有編輯器"
-      },
-      {
-        name: "郵件伺服器設定（SMTP）",
-        status: "ok",
-        ievents: "/html/eventEmailServer.php",
-        note: "iEvents 額外有 SMTP 設定頁，承興可用"
-      }
-    ]
-  },
-  {
-    title: "7. 會員系統管理",
-    price: "$32,607",
-    items: [
-      {
-        name: "一般註冊",
-        sub: "Email + 驗證信",
-        status: "ok",
-        ievents: "/html/register.php",
-        note: "iEvents 註冊頁完整可用"
-      },
-      {
-        name: "LINE 註冊 / 登入",
-        status: "new",
-        ievents: null,
-        note: "iEvents 無社群登入，程式新做（承興之前已做過經驗可沿用）"
-      },
-      {
-        name: "Google 註冊 / 登入",
-        status: "new",
-        ievents: null,
-        note: "iEvents 無，程式新做"
-      },
-      {
-        name: "帳號密碼登入",
-        status: "ok",
-        ievents: "/html/login.php",
-        note: "iEvents 登入頁可用"
-      },
-      {
-        name: "忘記密碼",
-        sub: "Email 重設",
-        status: "ok",
-        ievents: "/html/login.php Modal + /html/resetPW.php",
-        note: "iEvents 完整對應"
-      },
-      {
-        name: "密碼變更",
-        status: "ok",
-        ievents: "/html/memberInfo.php",
-        note: "iEvents 帳戶資料內處理"
-      },
-      {
-        name: "前台修改會員資料",
-        status: "ok",
-        ievents: "/html/memberInfo.php",
-        note: "iEvents 帳戶資料頁可用"
-      },
-      {
-        name: "會員登入後查報名紀錄",
-        status: "ok",
-        ievents: "/html/eventRegister.php",
-        note: "iEvents 有名單可對應"
-      },
-      {
-        name: "後台新增 / 修改 / 刪除 會員",
-        status: "partial",
-        ievents: "/html/eventRegister.php",
-        note: "iEvents 是報名名單概念，需確認是否為會員管理，可能程式補後台會員 CRUD"
-      },
-      {
-        name: "會員搜尋（條件 + 模糊）",
-        status: "ok",
-        ievents: "/html/eventRegister.php",
-        note: "iEvents 有搜尋"
-      },
-      {
-        name: "舊會員名單匯入",
-        sub: "從 acumen 舊系統",
-        status: "new",
-        ievents: null,
-        note: "承興特殊需求，程式新做匯入工具（欄位對應 + 驗證）"
-      },
-      {
-        name: "後台會員匯入 / 匯出",
-        status: "new",
-        ievents: null,
-        note: "程式新做 CSV 匯入匯出功能"
-      }
-    ]
-  },
-  {
-    title: "8. 購物功能管理（訂單）",
-    price: "$13,000",
-    items: [
-      {
-        name: "購物車機制",
-        status: "new",
-        ievents: null,
-        note: "iEvents 完全沒有購物車，程式全新做"
-      },
-      {
-        name: "購物明細頁",
-        status: "new",
-        ievents: null,
-        note: "程式新做（切版頁數含在報價 21 頁內）"
-      },
-      {
-        name: "購物確認頁",
-        status: "new",
-        ievents: null,
-        note: "程式新做"
-      },
-      {
-        name: "未登入可加入購物車",
-        status: "new",
-        ievents: null,
-        note: "程式新做（Local Storage / Session）"
-      },
-      {
-        name: "登入才能付款",
-        status: "new",
-        ievents: null,
-        note: "程式新做（流程控制）"
-      },
-      {
-        name: "填收件資料（勾選「與會員相同」）",
-        status: "new",
-        ievents: null,
-        note: "程式新做表單 + 自動帶入"
-      },
-      {
-        name: "後台訂單查詢 / 搜尋",
-        sub: "編號 / 客戶名 / 關鍵字",
-        status: "new",
-        ievents: null,
-        note: "iEvents 無訂單概念，程式全新做"
-      },
-      {
-        name: "訂單匯出",
-        status: "new",
-        ievents: null,
-        note: "程式新做"
-      }
-    ]
-  },
-  {
-    title: "9. 串接金流",
-    price: "$10,000",
-    items: [
-      {
-        name: "藍新金流串接（一次性刷卡）",
-        status: "new",
-        ievents: "/html/eventPayment.php",
-        note: "iEvents 有藍新設定切版（商家代號、Hash Key、Hash IV），但金流串接程式需新做。分期付款另議"
-      }
-    ]
-  },
-  {
-    title: "10. 隱藏項目（iEvents 有 / 報價沒）",
-    price: "—",
-    items: [
-      {
-        name: "帳戶方案管理",
-        sub: "SaaS 訂閱方案",
-        status: "hide",
-        ievents: "/html/memberPlan.php",
-        note: "承興是單一客戶非 SaaS，設計端隱藏"
-      },
-      {
-        name: "點數使用紀錄",
-        status: "hide",
-        ievents: "/html/pointLog.php",
-        note: "iEvents 本身也未完成，承興不需要，隱藏"
-      },
-      {
-        name: "環境設定（部分）",
-        status: "hide",
-        ievents: "/html/envSetting.php",
-        note: "SaaS 帳戶層級設定，承興用不到，可簡化或隱藏"
-      },
-      {
-        name: "問卷管理",
-        status: "hide",
-        ievents: "/html/eventSurvey.php + eventSurveyEdit.php + eventSurveyPreview.php",
-        note: "報價未含問卷功能，設計端隱藏"
-      },
-      {
-        name: "來賓專屬頁",
-        status: "hide",
-        ievents: "/html/guestPage.php + guestPagePreview.php",
-        note: "報價未含，設計端隱藏"
-      },
-      {
-        name: "SMS 管理",
-        sub: "eventSms + eventSmsEdit",
-        status: "hide",
-        ievents: "/html/eventSms.php + /html/eventSmsEdit.php",
-        note: "報價只做 Email 通知，SMS 不做，隱藏"
-      },
-      {
-        name: "票券種類",
-        status: "hide",
-        ievents: "/html/eventTicketType.php",
-        note: "[Q10] 程式可處理。承興用「活動」+「進場人數」不分票種，可隱藏或保留做 VIP/一般分級"
-      },
-      {
-        name: "健康聲明表單",
-        status: "hide",
-        ievents: null,
-        note: "iEvents 本身也未製作（疫情時期產物），不做"
-      }
-    ]
-  }
-];
-
-// =====================================================
-// 渲染
-// =====================================================
-const STATUS_LABEL = {
-  ok: '可用',
-  partial: '部分可用',
-  new: '需新做',
-  hide: '隱藏'
-};
-
-const canvas = document.getElementById('canvas');
-const stats = { ok: 0, partial: 0, new: 0, hide: 0 };
-
-sections.forEach((sec, si) => {
-  const section = document.createElement('section');
-  section.className = 'section';
-
-  const head = document.createElement('div');
-  head.className = 'section-head';
-  head.innerHTML = `
-    <div class="section-index">${si + 1}</div>
-    <div class="section-title">${sec.title}</div>
-    <div class="section-price">${sec.price}</div>
-    <div class="section-toggle">▾</div>
-  `;
-  head.addEventListener('click', () => section.classList.toggle('collapsed'));
-  section.appendChild(head);
-
-  const body = document.createElement('div');
-  body.className = 'section-body';
-
-  const cards = document.createElement('div');
-  cards.className = 'cards';
-
-  sec.items.forEach(item => {
-    stats[item.status]++;
-
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.dataset.status = item.status;
-
-    const statusLabel = STATUS_LABEL[item.status];
-    const ieventsHtml = item.ievents
-      ? `<div class="card-ievents"><span class="label">iEvents</span>${escapeHtml(item.ievents)}</div>`
-      : `<div class="card-ievents empty"><span class="label">iEvents</span>無對應切版</div>`;
-
-    const noteHtml = item.note
-      ? `<div class="card-note ${item.status === 'hide' ? 'plain' : ''}"><span class="label">備註給程式</span>${escapeHtml(item.note)}</div>`
-      : '';
-
-    card.innerHTML = `
-      <div class="card-head">
-        <div class="card-name">${escapeHtml(item.name)}${item.sub ? `<span class="sub">${escapeHtml(item.sub)}</span>` : ''}</div>
-        <span class="status-tag ${item.status}">${statusLabel}</span>
-      </div>
-      ${ieventsHtml}
-      ${noteHtml}
-    `;
-    cards.appendChild(card);
-  });
-
-  body.appendChild(cards);
-  section.appendChild(body);
-  canvas.appendChild(section);
-});
-
-// 統計
-const total = stats.ok + stats.partial + stats.new + stats.hide;
-document.getElementById('stat-total').textContent = total;
-document.getElementById('stat-ok').textContent = stats.ok;
-document.getElementById('stat-partial').textContent = stats.partial;
-document.getElementById('stat-new').textContent = stats.new;
-document.getElementById('stat-hide').textContent = stats.hide;
-document.getElementById('count-all').textContent = total;
-document.getElementById('count-ok').textContent = stats.ok;
-document.getElementById('count-partial').textContent = stats.partial;
-document.getElementById('count-new').textContent = stats.new;
-document.getElementById('count-hide').textContent = stats.hide;
-
-// 篩選
-document.querySelectorAll('.filter-btn').forEach(btn => {
+// Theme switcher
+document.querySelectorAll('.theme-btn').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    const theme = btn.dataset.theme;
+    document.body.className = theme;
+    document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    const filter = btn.dataset.filter;
-    document.querySelectorAll('.card').forEach(card => {
-      if (filter === 'all' || card.dataset.status === filter) {
-        card.classList.remove('hidden');
-      } else {
-        card.classList.add('hidden');
-      }
-    });
-    // Hide empty sections
-    document.querySelectorAll('.section').forEach(section => {
-      const visibleCards = section.querySelectorAll('.card:not(.hidden)').length;
-      section.style.display = visibleCards === 0 ? 'none' : '';
-    });
   });
 });
 
-function escapeHtml(s) {
-  if (s == null) return '';
-  return String(s)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+// Tab switcher
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    const target = tab.dataset.tab;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(target).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+});
+
+// Lightbox
+const lightbox = document.createElement('div');
+lightbox.className = 'lightbox';
+lightbox.innerHTML = '<button class="lightbox-close">關閉 ✕</button><img alt="">';
+document.body.appendChild(lightbox);
+const lightboxImg = lightbox.querySelector('img');
+const lightboxClose = lightbox.querySelector('.lightbox-close');
+document.querySelectorAll('.screenshot').forEach(img => {
+  img.addEventListener('click', (e) => {
+    e.stopPropagation();
+    lightboxImg.src = img.src;
+    lightboxImg.alt = img.alt;
+    lightbox.classList.add('active');
+  });
+});
+lightbox.addEventListener('click', () => lightbox.classList.remove('active'));
+lightboxClose.addEventListener('click', (e) => {
+  e.stopPropagation();
+  lightbox.classList.remove('active');
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') lightbox.classList.remove('active');
+});
+
+// Mobile nav
+const sidebar = document.getElementById('sidebar');
+const backdrop = document.getElementById('sidebar-backdrop');
+const mobileToggle = document.getElementById('mobile-nav-toggle');
+function toggleSidebar(show) {
+  sidebar.classList.toggle('open', show);
+  backdrop.classList.toggle('show', show);
 }
+mobileToggle.addEventListener('click', () => toggleSidebar(!sidebar.classList.contains('open')));
+backdrop.addEventListener('click', () => toggleSidebar(false));
+sidebar.addEventListener('click', (e) => {
+  if (e.target.closest('.nav-item')) toggleSidebar(false);
+});
 </script>
 
 </body>
